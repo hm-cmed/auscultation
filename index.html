@@ -9,7 +9,7 @@
   --bg: #0e1512; --panel: #16201b; --paper: #f4f1e8; --ink: #17231c;
   --accent: #5a8f6b; --accent2: #c98a3f; --sub: #8ba394; --border: #24332b;
   --good: #5a8f6b; --bad: #c1584a; --warn: #c98a3f;
-  --sans: "Hiragino Sans","Noto Sans JP","Yu Gothic",-apple-system,sans-serif;
+  --sans: "Hiragino Sans","Noto Sans JP","Malgun Gothic","Microsoft YaHei","Noto Sans KR","Noto Sans SC",-apple-system,sans-serif;
   --mono: ui-monospace,"SF Mono","JetBrains Mono",Consolas,monospace;
   box-sizing: border-box;
   padding-top: env(safe-area-inset-top, 0px);
@@ -21,21 +21,29 @@ body { font-family: var(--sans); background: var(--bg); color: #e8ece9; font-siz
   :root:not([data-theme="dark"]) { --bg:#eef2ee; --panel:#ffffff; --border:#dde3dc; }
   body { color: #17231c; }
 }
+body.embed { background: transparent; }
 
 header { padding: 18px 26px 14px; border-bottom: 1px solid var(--border); background: var(--panel); }
-.htop { display: flex; align-items: baseline; justify-content: space-between; flex-wrap: wrap; gap: 10px; }
+.htop { display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 10px; }
 h1 { font-size: 18px; font-weight: 700; }
 h1 .sub { font-size: 12px; color: var(--sub); font-weight: 400; margin-left: 10px; }
+.hright { display: flex; align-items: center; gap: 10px; }
 .modes { display: flex; gap: 2px; background: var(--bg); border-radius: 8px; padding: 3px; }
 .modes button { border: none; background: none; color: var(--sub); font-family: var(--sans);
   font-size: 12.5px; font-weight: 600; padding: 7px 16px; border-radius: 6px; cursor: pointer; }
 .modes button.active { background: var(--accent); color: #0e1512; }
+.langsel { display: flex; gap: 2px; background: var(--bg); border-radius: 8px; padding: 3px; }
+.langsel button { border: none; background: none; color: var(--sub); font-family: var(--sans);
+  font-size: 11.5px; font-weight: 600; padding: 6px 10px; border-radius: 6px; cursor: pointer; }
+.langsel button.active { background: var(--accent2); color: #17130a; }
 
 .layout { display: grid; grid-template-columns: 380px 1fr; gap: 0; min-height: calc(100vh - 64px); }
 @media (max-width: 860px) { .layout { grid-template-columns: 1fr; } }
+body.embed .layout { grid-template-columns: 1fr; min-height: auto; }
 
 .diagram-pane { padding: 22px; border-right: 1px solid var(--border); background: var(--panel);
   display: flex; flex-direction: column; align-items: center; }
+body.embed .diagram-pane { border-right: none; padding: 14px; }
 .now-playing { min-height: 34px; font-size: 12.5px; color: var(--accent); font-weight: 600;
   text-align: center; margin-bottom: 6px; }
 .now-playing .loc { color: var(--sub); font-weight: 400; }
@@ -50,19 +58,29 @@ svg#body { touch-action: none; }
 .landmark text.lbl { font-size: 8.5px; fill: var(--sub); pointer-events: none; }
 
 .main-pane { padding: 22px 26px; overflow-y: auto; }
+body.embed .main-pane { padding: 10px 18px 18px; }
 
 /* --- 自由練習モード --- */
 .practice-controls { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; margin-bottom: 18px; }
+body.embed .practice-controls { display: none; }
 .pc-group label { display: block; font-size: 11px; color: var(--sub); margin-bottom: 4px; }
 .pc-group select { width: 100%; background: var(--panel); border: 1px solid var(--border);
   border-radius: 6px; padding: 8px 10px; color: inherit; font-family: var(--sans); font-size: 13px; }
 .hint { font-size: 12.5px; color: var(--sub); background: var(--panel); border: 1px solid var(--border);
   border-radius: 6px; padding: 12px 14px; line-height: 1.8; }
+body.embed .hint { display: none; }
 .hint b { color: var(--accent); }
 .finding-desc { margin-top: 14px; padding: 14px 16px; background: var(--paper); color: var(--ink);
   border-radius: 6px; font-size: 12.5px; line-height: 1.8; display: none; }
 .finding-desc.show { display: block; }
 .finding-desc h3 { font-size: 13px; margin-bottom: 6px; }
+.link-row { display: flex; align-items: center; gap: 8px; margin-top: 12px; }
+body.embed .link-row { display: none; }
+.link-btn { font-family: var(--sans); font-size: 11.5px; font-weight: 600; border: 1px solid var(--border);
+  background: var(--panel); color: var(--accent); border-radius: 6px; padding: 7px 12px; cursor: pointer; }
+.link-btn:hover { border-color: var(--accent); }
+.link-status { font-size: 11px; color: var(--accent); opacity: 0; transition: opacity .2s; }
+.link-status.show { opacity: 1; }
 
 /* --- OSCEモード --- */
 .osce-top { display: flex; align-items: center; gap: 12px; margin-bottom: 16px; }
@@ -101,35 +119,39 @@ button.act { font-family: var(--sans); font-size: 13px; font-weight: 600; border
 .mark.hit { background: var(--good); color: #0e1512; }
 .mark.miss { background: var(--panel); border: 1.5px solid var(--border); color: var(--sub); }
 .rubric-label { font-size: 12px; font-weight: 600; }
-.rubric-kw { font-size: 10.5px; color: var(--sub); margin-top: 2px; }
 .explain { background: var(--panel); border: 1px solid var(--border); border-radius: 6px;
   padding: 13px 15px; margin-top: 12px; font-size: 12.5px; line-height: 1.8; }
 .explain .t { font-size: 11px; font-weight: 700; color: var(--accent); margin-bottom: 5px; }
 
 .footer-note { font-size: 10.5px; color: var(--sub); margin-top: 24px; line-height: 1.7; }
+body.embed .footer-note { display: none; }
 </style>
 </head>
 <body>
 
 <header>
   <div class="htop">
-    <h1>聴診トレーナー<span class="sub">Auscultation Trainer</span></h1>
-    <div class="modes">
-      <button id="modeBtnPractice" class="active">自由練習</button>
-      <button id="modeBtnOsce">OSCEモード</button>
+    <h1 id="appTitle">聴診トレーナー<span class="sub" id="appSubtitle">Auscultation Trainer</span></h1>
+    <div class="hright">
+      <div class="langsel">
+        <button data-lang="ja" class="active">日本語</button>
+        <button data-lang="en">EN</button>
+        <button data-lang="ko">한국어</button>
+        <button data-lang="zh">中文</button>
+      </div>
+      <div class="modes" id="modeToggle">
+        <button id="modeBtnPractice" class="active"></button>
+        <button id="modeBtnOsce"></button>
+      </div>
     </div>
   </div>
 </header>
 
 <div class="layout">
   <div class="diagram-pane">
-    <div class="now-playing" id="nowPlaying">部位にマウスを重ねると聴診音が再生されます</div>
+    <div class="now-playing" id="nowPlaying"></div>
     <svg id="body" viewBox="0 -32 220 372" width="300" height="420"></svg>
-    <div class="legend">
-      <span class="r">●</span> 患者の右（画面向かって左）　
-      <span class="l">●</span> 患者の左（画面向かって右）<br>
-      正面から患者と向き合う体位で描画
-    </div>
+    <div class="legend" id="legendText"></div>
   </div>
 
   <div class="main-pane">
@@ -138,106 +160,179 @@ button.act { font-family: var(--sans); font-size: 13px; font-weight: 600; border
     <div id="panePractice">
       <div class="practice-controls">
         <div class="pc-group">
-          <label>臓器・系統</label>
+          <label id="lblOrgan"></label>
           <select id="selOrgan"></select>
         </div>
         <div class="pc-group">
-          <label>所見</label>
+          <label id="lblFinding"></label>
           <select id="selFinding"></select>
         </div>
       </div>
-      <div class="hint">
-        <b>使い方：</b>上のプルダウンで聞きたい所見を選び、体の対応する部位にマウスを重ねてください。
-        マウスを乗せている間、その所見の音がループ再生されます。心拍数・呼吸数はスライダーではなく
-        典型値で固定していますが、所見選択のプルダウンから正常〜重症まで切り替えられます。
-      </div>
+      <div class="hint" id="practiceHint"></div>
       <div class="finding-desc" id="findingDesc"></div>
+      <div class="link-row">
+        <button class="link-btn" id="getLinkBtn"></button>
+        <span class="link-status" id="linkStatus"></span>
+      </div>
     </div>
 
     <!-- OSCEモード -->
     <div id="paneOsce" style="display:none">
       <div class="osce-top">
         <div class="progress-bar"><div class="progress-fill" id="pfill"></div></div>
-        <div style="font-size:11.5px;color:var(--sub);font-family:var(--mono)" id="ptxt">1 / 10</div>
+        <div style="font-size:11.5px;color:var(--sub);font-family:var(--mono)" id="ptxt">1 / 7</div>
         <div class="score-chip" id="schip">0 pt</div>
       </div>
       <div class="vignette" id="vignette"></div>
       <div class="checklist-box">
-        <div class="t">聴診した部位（参考：主要8部位を目安に確認してください）</div>
+        <div class="t" id="checklistTitle"></div>
         <div class="chk-items" id="chkItems"></div>
       </div>
       <div class="answer-box">
-        <label>聴診所見と考えられる病態を記述してください</label>
-        <textarea id="osceAnswer" placeholder="例：心尖部で全収縮期性雑音を聴取。僧帽弁閉鎖不全を疑う。"></textarea>
+        <label id="answerLabel"></label>
+        <textarea id="osceAnswer"></textarea>
       </div>
       <div class="btnrow">
-        <button class="act primary" id="osceSubmit">採点する</button>
-        <button class="act secondary" id="osceNext" style="display:none">次の症例へ</button>
+        <button class="act primary" id="osceSubmit"></button>
+        <button class="act secondary" id="osceNext" style="display:none"></button>
       </div>
       <div id="osceResult"></div>
     </div>
 
-    <div class="footer-note">
-      本アプリの聴診音はすべて Web Audio API によるリアルタイム音響合成であり、実録音ではありません。
-      心音・肺音・腸雑音・血管雑音の音響学的パラメータ（周波数帯域・持続時間・包絡線形状）は
-      公表文献の代表値に基づく近似モデルです。教育目的の合成音であり、実機聴診の代替にはなりません。
-      採点はキーワードベースの部分点評価で、AIによる自由記述判定は行っていません。
-    </div>
+    <div class="footer-note" id="footerNote"></div>
   </div>
 </div>
 
 <script>
 /* ============================================================================
+   多言語UI文字列
+============================================================================ */
+const UI = {
+  ja: {
+    title: "聴診トレーナー", subtitle: "Auscultation Trainer",
+    modePractice: "自由練習", modeOsce: "OSCEモード",
+    hoverHint: "部位にマウスを重ねると聴診音が再生されます",
+    listening: "聴診中：",
+    legend: '<span class="r">●</span> 患者の右（画面向かって左）　<span class="l">●</span> 患者の左（画面向かって右）<br>正面から患者と向き合う体位で描画',
+    lblOrgan: "臓器・系統", lblFinding: "所見",
+    practiceHint: "上のプルダウンで聞きたい所見を選び、体の対応する部位にマウスを重ねてください。マウスを乗せている間、その所見の音がループ再生されます。",
+    getLink: "この所見の共有リンクを取得", linkCopied: "リンクをコピーしました",
+    checklistTitle: "聴診した部位（参考：主要部位を目安に確認してください）",
+    answerLabel: "聴診所見と考えられる病態を記述してください",
+    answerPlaceholder: "例：心尖部で全収縮期性雑音を聴取。僧帽弁閉鎖不全を疑う。",
+    submitBtn: "採点する", nextBtn: "次の症例へ", restartBtn: "最初からやり直す",
+    diagnosisTitle: "想定診断", checklistResultTitle: "聴診部位の確認",
+    checklistResultBody: (n, total) => `本症例で所見のある ${total} 部位中 ${n} 部位を聴診しました。`,
+    finishedLabel: (n) => `全${n}症例終了`,
+    footerNote: "本アプリの聴診音はすべて Web Audio API によるリアルタイム音響合成であり、実録音ではありません。心音・肺音・腸雑音・血管雑音の音響学的パラメータは公表文献の代表値に基づく近似モデルです。教育目的の合成音であり、実機聴診の代替にはなりません。採点はキーワードベースの部分点評価です。",
+  },
+  en: {
+    title: "Auscultation Trainer", subtitle: "聴診トレーナー",
+    modePractice: "Free Practice", modeOsce: "OSCE Mode",
+    hoverHint: "Hover over a body location to hear the auscultation sound",
+    listening: "Listening: ",
+    legend: '<span class="r">●</span> Patient\'s right (viewer\'s left)　<span class="l">●</span> Patient\'s left (viewer\'s right)<br>Drawn as the patient facing the examiner',
+    lblOrgan: "System", lblFinding: "Finding",
+    practiceHint: "Choose a finding from the dropdowns above, then hover over the matching body location. The sound loops while your cursor stays there.",
+    getLink: "Get shareable link for this finding", linkCopied: "Link copied",
+    checklistTitle: "Locations auscultated (guide: check the main points)",
+    answerLabel: "Describe the auscultation finding and the likely condition",
+    answerPlaceholder: "e.g. Holosystolic murmur at the apex. Suspect mitral regurgitation.",
+    submitBtn: "Grade my answer", nextBtn: "Next case", restartBtn: "Start over",
+    diagnosisTitle: "Expected diagnosis", checklistResultTitle: "Auscultation coverage",
+    checklistResultBody: (n, total) => `You auscultated ${n} of ${total} locations relevant to this case.`,
+    finishedLabel: (n) => `All ${n} cases completed`,
+    footerNote: "All auscultation sounds in this app are synthesized in real time via the Web Audio API — none are real recordings. Acoustic parameters for heart, lung, bowel, and vascular sounds are approximate models based on representative values from published literature. These synthetic sounds are for education only and are not a substitute for real auscultation. Scoring uses keyword-based partial credit.",
+  },
+  ko: {
+    title: "청진 트레이너", subtitle: "Auscultation Trainer",
+    modePractice: "자유 연습", modeOsce: "OSCE 모드",
+    hoverHint: "신체 부위에 마우스를 올리면 청진음이 재생됩니다",
+    listening: "청진 중: ",
+    legend: '<span class="r">●</span> 환자의 오른쪽（화면 기준 왼쪽）　<span class="l">●</span> 환자의 왼쪽（화면 기준 오른쪽）<br>환자와 마주 보는 자세로 그려짐',
+    lblOrgan: "계통", lblFinding: "소견",
+    practiceHint: "위 드롭다운에서 듣고 싶은 소견을 선택한 후, 신체의 해당 부위에 마우스를 올리세요. 마우스를 올려둔 동안 해당 소견의 소리가 반복 재생됩니다.",
+    getLink: "이 소견의 공유 링크 받기", linkCopied: "링크가 복사되었습니다",
+    checklistTitle: "청진한 부위 (참고: 주요 부위를 확인하세요)",
+    answerLabel: "청진 소견과 의심되는 병태를 서술하세요",
+    answerPlaceholder: "예: 심첨부에서 전수축기 잡음 청취. 승모판 폐쇄부전 의심.",
+    submitBtn: "채점하기", nextBtn: "다음 증례", restartBtn: "처음부터 다시",
+    diagnosisTitle: "예상 진단", checklistResultTitle: "청진 부위 확인",
+    checklistResultBody: (n, total) => `이 증례에서 소견이 있는 ${total}개 부위 중 ${n}개 부위를 청진했습니다.`,
+    finishedLabel: (n) => `전체 ${n}개 증례 완료`,
+    footerNote: "이 앱의 모든 청진음은 Web Audio API를 이용해 실시간으로 합성된 소리이며, 실제 녹음이 아닙니다. 심음·폐음·장음·혈관잡음의 음향학적 매개변수는 공개 문헌의 대표값에 기반한 근사 모델입니다. 교육 목적의 합성음이며 실제 청진을 대체할 수 없습니다. 채점은 키워드 기반 부분 점수 방식입니다.",
+  },
+  zh: {
+    title: "听诊训练器", subtitle: "Auscultation Trainer",
+    modePractice: "自由练习", modeOsce: "OSCE 模式",
+    hoverHint: "将鼠标悬停在身体部位上即可播放听诊音",
+    listening: "听诊中：",
+    legend: '<span class="r">●</span> 患者的右侧（画面左侧）　<span class="l">●</span> 患者的左侧（画面右侧）<br>按与患者面对面检查的体位绘制',
+    lblOrgan: "系统", lblFinding: "体征",
+    practiceHint: "在上方下拉菜单中选择想听的体征，然后将鼠标悬停在身体对应部位。鼠标停留期间会循环播放该体征的声音。",
+    getLink: "获取此体征的分享链接", linkCopied: "链接已复制",
+    checklistTitle: "已听诊的部位（参考：请确认主要部位）",
+    answerLabel: "请描述听诊所见及可能的病因",
+    answerPlaceholder: "例：心尖部可闻及全收缩期杂音，考虑二尖瓣关闭不全。",
+    submitBtn: "提交评分", nextBtn: "下一病例", restartBtn: "重新开始",
+    diagnosisTitle: "预期诊断", checklistResultTitle: "听诊部位确认",
+    checklistResultBody: (n, total) => `本病例共有 ${total} 个相关部位，您听诊了其中 ${n} 个。`,
+    finishedLabel: (n) => `全部 ${n} 个病例已完成`,
+    footerNote: "本应用的所有听诊音均通过 Web Audio API 实时合成，并非真实录音。心音、肺音、肠鸣音、血管杂音的声学参数是基于已发表文献代表值的近似模型。这些合成音仅供教学使用，不能替代真实听诊。评分采用基于关键词的部分给分方式。",
+  },
+};
+let lang = "ja";
+
+function t(key, ...args) {
+  const entry = UI[lang][key];
+  return typeof entry === "function" ? entry(...args) : entry;
+}
+function tf(obj) { return (obj && (obj[lang] || obj.ja)) || ""; }
+
+/* ============================================================================
    体表ランドマーク座標系
    患者を正面から見た図（仰臥位、検者と向き合う）：
    患者の解剖学的右→画像左（x<110）、患者の解剖学的左→画像右（x>110）。
-   ※ examtech.py と同一規約。過去に腹部の座標だけこの規約に反していた
-   （生成AIが左右を逆に配置しやすい既知の失敗パターン）ため、
-   全ランドマークで「患者右→x<110」を目視確認してから確定している。
 ============================================================================ */
 const LANDMARKS = {
-  aortic:     {x: 88,  y: 62,  label: "大動脈弁領域",  organ: "heart"},
-  pulmonic:   {x: 132, y: 62,  label: "肺動脈弁領域",  organ: "heart"},
-  tricuspid:  {x: 108, y: 92,  label: "三尖弁領域",    organ: "heart"},
-  mitral:     {x: 138, y: 108, label: "僧帽弁領域（心尖部）", organ: "heart"},
+  aortic:     {x: 88,  y: 62,  label: {ja:"大動脈弁領域", en:"Aortic area", ko:"대동맥판 영역", zh:"主动脉瓣区"}, organ: "heart"},
+  pulmonic:   {x: 132, y: 62,  label: {ja:"肺動脈弁領域", en:"Pulmonic area", ko:"폐동맥판 영역", zh:"肺动脉瓣区"}, organ: "heart"},
+  tricuspid:  {x: 108, y: 92,  label: {ja:"三尖弁領域", en:"Tricuspid area", ko:"삼첨판 영역", zh:"三尖瓣区"}, organ: "heart"},
+  mitral:     {x: 138, y: 108, label: {ja:"僧帽弁領域（心尖部）", en:"Mitral area (apex)", ko:"승모판 영역(심첨부)", zh:"二尖瓣区（心尖部）"}, organ: "heart"},
 
-  lung_ru: {x: 82,  y: 55,  label: "右肺 上", organ: "lung"},
-  lung_lu: {x: 138, y: 55,  label: "左肺 上", organ: "lung"},
-  lung_rm: {x: 76,  y: 88,  label: "右肺 中", organ: "lung"},
-  lung_lm: {x: 144, y: 88,  label: "左肺 中", organ: "lung"},
-  lung_rl: {x: 78,  y: 122, label: "右肺 下", organ: "lung"},
-  lung_ll: {x: 142, y: 122, label: "左肺 下", organ: "lung"},
+  lung_ru: {x: 82,  y: 55,  label: {ja:"右肺 上", en:"R lung, upper", ko:"우폐 상부", zh:"右肺上部"}, organ: "lung"},
+  lung_lu: {x: 138, y: 55,  label: {ja:"左肺 上", en:"L lung, upper", ko:"좌폐 상부", zh:"左肺上部"}, organ: "lung"},
+  lung_rm: {x: 76,  y: 88,  label: {ja:"右肺 中", en:"R lung, mid", ko:"우폐 중부", zh:"右肺中部"}, organ: "lung"},
+  lung_lm: {x: 144, y: 88,  label: {ja:"左肺 中", en:"L lung, mid", ko:"좌폐 중부", zh:"左肺中部"}, organ: "lung"},
+  lung_rl: {x: 78,  y: 122, label: {ja:"右肺 下", en:"R lung, lower", ko:"우폐 하부", zh:"右肺下部"}, organ: "lung"},
+  lung_ll: {x: 142, y: 122, label: {ja:"左肺 下", en:"L lung, lower", ko:"좌폐 하부", zh:"左肺下部"}, organ: "lung"},
 
-  ruq: {x: 92,  y: 168, label: "右上腹部", organ: "bowel"},
-  luq: {x: 128, y: 168, label: "左上腹部", organ: "bowel"},
-  rlq: {x: 92,  y: 202, label: "右下腹部", organ: "bowel"},
-  llq: {x: 128, y: 202, label: "左下腹部", organ: "bowel"},
+  ruq: {x: 92,  y: 168, label: {ja:"右上腹部", en:"RUQ", ko:"우상복부", zh:"右上腹"}, organ: "bowel"},
+  luq: {x: 128, y: 168, label: {ja:"左上腹部", en:"LUQ", ko:"좌상복부", zh:"左上腹"}, organ: "bowel"},
+  rlq: {x: 92,  y: 202, label: {ja:"右下腹部", en:"RLQ", ko:"우하복부", zh:"右下腹"}, organ: "bowel"},
+  llq: {x: 128, y: 202, label: {ja:"左下腹部", en:"LLQ", ko:"좌하복부", zh:"左下腹"}, organ: "bowel"},
 
-  carotid_r: {x: 96,  y: 24, label: "右頸動脈", organ: "vascular"},
-  carotid_l: {x: 124, y: 24, label: "左頸動脈", organ: "vascular"},
+  carotid_r: {x: 96,  y: 24, label: {ja:"右頸動脈", en:"R carotid", ko:"우측 경동맥", zh:"右颈动脉"}, organ: "vascular"},
+  carotid_l: {x: 124, y: 24, label: {ja:"左頸動脈", en:"L carotid", ko:"좌측 경동맥", zh:"左颈动脉"}, organ: "vascular"},
 };
 
 function buildBodySVG() {
   const svg = document.getElementById("body");
+  svg.innerHTML = "";
   const ns = "http://www.w3.org/2000/svg";
   function el(tag, attrs) {
     const e = document.createElementNS(ns, tag);
     for (const k in attrs) e.setAttribute(k, attrs[k]);
     return e;
   }
-  // 頭部
   svg.appendChild(el("ellipse", {cx:110, cy:-6, rx:24, ry:22, fill:"#1c2921", stroke:"#3a5045"}));
   svg.appendChild(el("path", {d:"M92,14 L128,14 L124,32 L96,32 Z", fill:"#1c2921", stroke:"#3a5045"}));
-  // 体幹
   svg.appendChild(el("path", {
     d: "M40,32 L180,32 L168,232 L52,232 Z",
     fill: "#1c2921", stroke: "#3a5045", "stroke-width": "1.4"
   }));
-  // 肋骨弓の目安線
   svg.appendChild(el("path", {d:"M62,148 L110,160 L158,148", fill:"none", stroke:"#2f4238", "stroke-width":"1", "stroke-dasharray":"3,2"}));
-  // 臍
   svg.appendChild(el("circle", {cx:110, cy:186, r:2, fill:"#3a5045"}));
-  // 骨盤ライン
   svg.appendChild(el("line", {x1:54, y1:230, x2:166, y2:230, stroke:"#2f4238", "stroke-width":"1", "stroke-dasharray":"3,2"}));
 
   for (const key in LANDMARKS) {
@@ -245,22 +340,15 @@ function buildBodySVG() {
     const g = el("g", {class: "landmark", "data-key": key});
     g.appendChild(el("circle", {class:"dot", cx: lm.x, cy: lm.y, r: 7}));
     const label = el("text", {class:"lbl", x: lm.x, y: lm.y - 10, "text-anchor":"middle"});
-    label.textContent = lm.label.replace(/^[右左].../, "");
+    label.textContent = tf(lm.label).replace(/^[RL右左우좌][側肺폐肺]?/, "");
     g.appendChild(label);
     svg.appendChild(g);
   }
+  attachLandmarkHandlers();
 }
-buildBodySVG();
 
 /* ============================================================================
-   Web Audio 合成エンジン
-   研究に基づく近似モデル：
-     心音 S1/S2: attack付き減衰正弦波（Gaborアトム近似）
-     雑音: 帯域制限ノイズ×包絡線（crescendo-decrescendo / plateau / decrescendo / continuous）
-     肺音: 帯域制限ノイズ（吸気呼気で振幅変調）
-     crackle: 短い減衰正弦波バースト　wheeze: FM/AM変調正弦波
-     腸雑音: 減衰正弦波バーストのポアソン的配置
-     血管雑音: 収縮期同期の帯域制限ノイズ
+   Web Audio 合成エンジン（言語非依存）
 ============================================================================ */
 let actx = null;
 function getCtx() {
@@ -268,7 +356,6 @@ function getCtx() {
   if (actx.state === "suspended") actx.resume();
   return actx;
 }
-
 function noiseBuffer(ctx, durationSec) {
   const n = Math.max(1, Math.floor(ctx.sampleRate * durationSec));
   const buf = ctx.createBuffer(1, n, ctx.sampleRate);
@@ -276,7 +363,6 @@ function noiseBuffer(ctx, durationSec) {
   for (let i = 0; i < n; i++) d[i] = Math.random() * 2 - 1;
   return buf;
 }
-
 function dampedSine(ctx, dest, {start, freq, peak, attack, tau, dur}) {
   const t0 = ctx.currentTime + start;
   const osc = ctx.createOscillator();
@@ -288,7 +374,6 @@ function dampedSine(ctx, dest, {start, freq, peak, attack, tau, dur}) {
   osc.connect(g).connect(dest);
   osc.start(t0); osc.stop(t0 + dur);
 }
-
 function noiseEnvelope(ctx, dest, {start, dur, fLow, fHigh, shape, peak}) {
   const t0 = ctx.currentTime + start;
   const src = ctx.createBufferSource();
@@ -312,7 +397,7 @@ function noiseEnvelope(ctx, dest, {start, dur, fLow, fHigh, shape, peak}) {
     g.gain.linearRampToValueAtTime(peak, t0 + dur * 0.15);
     g.gain.setValueAtTime(peak, t0 + dur * 0.85);
     g.gain.linearRampToValueAtTime(0.0001, t0 + dur);
-  } else { // plateau
+  } else {
     g.gain.linearRampToValueAtTime(peak, t0 + dur * 0.1);
     g.gain.setValueAtTime(peak, t0 + dur * 0.9);
     g.gain.linearRampToValueAtTime(0.0001, t0 + dur);
@@ -320,7 +405,6 @@ function noiseEnvelope(ctx, dest, {start, dur, fLow, fHigh, shape, peak}) {
   src.connect(bp).connect(g).connect(dest);
   src.start(t0); src.stop(t0 + dur + 0.02);
 }
-
 function wheezeTone(ctx, dest, {start, dur, freq, peak}) {
   const t0 = ctx.currentTime + start;
   const osc = ctx.createOscillator(); osc.type = "sine"; osc.frequency.value = freq;
@@ -336,18 +420,14 @@ function wheezeTone(ctx, dest, {start, dur, freq, peak}) {
   lfo.start(t0); osc.start(t0);
   lfo.stop(t0 + dur); osc.stop(t0 + dur);
 }
-
-/* --- 心音サイクル（1拍分をスケジュールし、呼び出し側がループする） --- */
 function scheduleHeartCycle(ctx, dest, spec) {
   const hr = spec.hr || 72;
   const period = 60 / hr;
   const systole = period * 0.35;
   const s1 = {freq: 38, attack: 0.012, tau: 0.028, dur: 0.16, peak: 0.9};
   const s2 = {freq: 68, attack: 0.008, tau: 0.018, dur: 0.11, peak: 0.55};
-
   dampedSine(ctx, dest, {start: 0, freq: s1.freq, peak: s1.peak, attack: s1.attack, tau: s1.tau, dur: s1.dur});
   dampedSine(ctx, dest, {start: systole, freq: s2.freq, peak: s2.peak, attack: s2.attack, tau: s2.tau, dur: s2.dur});
-
   if (spec.gallop === "S3") {
     dampedSine(ctx, dest, {start: systole + 0.14, freq: 28, peak: 0.32, attack: 0.02, tau: 0.03, dur: 0.14});
   }
@@ -372,33 +452,28 @@ function scheduleHeartCycle(ctx, dest, spec) {
   }
   return period;
 }
-
-/* --- 肺音サイクル（1呼吸分） --- */
 function scheduleLungCycle(ctx, dest, spec) {
   const rr = spec.rr || 16;
   const period = 60 / rr;
   const insp = period * 0.42;
   const exp = period - insp;
-
-  const level = spec.level || "vesicular"; // vesicular | decreased | bronchial
+  const level = spec.level || "vesicular";
   let baseFLow = 200, baseFHigh = 600, inspPeak = 0.22, expPeak = 0.10;
   if (level === "decreased") { inspPeak *= 0.35; expPeak *= 0.35; }
   if (level === "bronchial") { baseFLow = 300; baseFHigh = 900; inspPeak = 0.16; expPeak = 0.20; }
-
   noiseEnvelope(ctx, dest, {start: 0, dur: insp, fLow: baseFLow, fHigh: baseFHigh, shape: "plateau", peak: inspPeak});
   noiseEnvelope(ctx, dest, {start: insp, dur: exp, fLow: baseFLow * 0.9, fHigh: baseFHigh * 0.9, shape: "decrescendo", peak: expPeak});
-
   if (spec.adventitious === "crackle_fine") {
     const n = 4 + Math.floor(Math.random() * 3);
     for (let i = 0; i < n; i++) {
-      const t = insp * (0.55 + 0.4 * Math.random());
-      dampedSine(ctx, dest, {start: t, freq: 650, peak: 0.35, attack: 0.001, tau: 0.004, dur: 0.02});
+      const tt = insp * (0.55 + 0.4 * Math.random());
+      dampedSine(ctx, dest, {start: tt, freq: 650, peak: 0.35, attack: 0.001, tau: 0.004, dur: 0.02});
     }
   } else if (spec.adventitious === "crackle_coarse") {
     const n = 3 + Math.floor(Math.random() * 2);
     for (let i = 0; i < n; i++) {
-      const t = insp * (0.15 + 0.6 * Math.random());
-      dampedSine(ctx, dest, {start: t, freq: 220, peak: 0.4, attack: 0.002, tau: 0.012, dur: 0.045});
+      const tt = insp * (0.15 + 0.6 * Math.random());
+      dampedSine(ctx, dest, {start: tt, freq: 220, peak: 0.4, attack: 0.002, tau: 0.012, dur: 0.045});
     }
   } else if (spec.adventitious === "wheeze") {
     wheezeTone(ctx, dest, {start: insp * 0.15, dur: exp * 0.75, freq: 550, peak: 0.28});
@@ -408,32 +483,27 @@ function scheduleLungCycle(ctx, dest, spec) {
   }
   return period;
 }
-
-/* --- 腸雑音（ループ長を返し、内部でバーストを確率配置） --- */
 function scheduleBowelLoop(ctx, dest, spec) {
   const loopDur = 6.0;
-  const kind = spec.kind || "normal"; // normal | hyperactive | hypoactive | absent | obstructive
+  const kind = spec.kind || "normal";
   let rate = 5, freq = 400, metallic = false;
   if (kind === "hyperactive") { rate = 14; }
   if (kind === "hypoactive") { rate = 1.5; }
   if (kind === "absent") { rate = 0; }
   if (kind === "obstructive") { rate = 8; freq = 1200; metallic = true; }
-
-  const nBursts = Math.round(rate * loopDur / 60 * 10); // 大まかなポアソン近似
+  const nBursts = Math.round(rate * loopDur / 60 * 10);
   for (let i = 0; i < nBursts; i++) {
-    const t = Math.random() * (loopDur - 0.1);
+    const tt = Math.random() * (loopDur - 0.1);
     if (metallic) {
-      dampedSine(ctx, dest, {start: t, freq: freq, peak: 0.3, attack: 0.001, tau: 0.02, dur: 0.08});
-      dampedSine(ctx, dest, {start: t + 0.02, freq: freq * 1.5, peak: 0.15, attack: 0.001, tau: 0.015, dur: 0.06});
+      dampedSine(ctx, dest, {start: tt, freq: freq, peak: 0.3, attack: 0.001, tau: 0.02, dur: 0.08});
+      dampedSine(ctx, dest, {start: tt + 0.02, freq: freq * 1.5, peak: 0.15, attack: 0.001, tau: 0.015, dur: 0.06});
     } else {
-      dampedSine(ctx, dest, {start: t, freq: freq * (0.85 + Math.random() * 0.3), peak: 0.32,
+      dampedSine(ctx, dest, {start: tt, freq: freq * (0.85 + Math.random() * 0.3), peak: 0.32,
         attack: 0.002, tau: 0.015, dur: 0.03});
     }
   }
   return loopDur;
 }
-
-/* --- 血管雑音（心周期に同期） --- */
 function scheduleBruit(ctx, dest, spec) {
   const hr = spec.hr || 72;
   const period = 60 / hr;
@@ -442,13 +512,9 @@ function scheduleBruit(ctx, dest, spec) {
     shape: spec.severity === "severe" ? "continuous" : "crescendo_decrescendo", peak: spec.peak || 0.3});
   return period;
 }
-
-/* --- ループ再生制御 --- */
 let loopTimer = null;
 let currentDest = null;
-function stopLoop() {
-  if (loopTimer) { clearTimeout(loopTimer); loopTimer = null; }
-}
+function stopLoop() { if (loopTimer) { clearTimeout(loopTimer); loopTimer = null; } }
 function startLoop(spec) {
   stopLoop();
   const ctx = getCtx();
@@ -469,91 +535,492 @@ function startLoop(spec) {
 }
 
 /* ============================================================================
-   所見ライブラリ（自由練習モード用）
+   所見ライブラリ（自由練習モード用）— 多言語
+   ★用語規約：「イレウス」は必ず麻痺性イレウス（機能性）を指す。
+   機械的腸閉塞は「腸閉塞」とし、両者を混同する表記は用いない。
 ============================================================================ */
 const FINDING_LIBRARY = {
   heart: {
-    label: "心音", points: ["aortic","pulmonic","tricuspid","mitral"],
+    label: {ja:"心音", en:"Heart sounds", ko:"심음", zh:"心音"},
+    points: ["aortic","pulmonic","tricuspid","mitral"],
     findings: {
-      normal:      {label: "正常心音（S1・S2のみ）", spec: {organ:"heart", hr:72},
-                   desc: "S1（第1心音）は僧帽弁・三尖弁閉鎖に由来し低調で長め。S2（第2心音）は大動脈弁・肺動脈弁閉鎖に由来し高調で短め。"},
-      s3_gallop:   {label: "S3奔馬調律（心不全）", spec: {organ:"heart", hr:88, gallop:"S3"},
-                   desc: "S2の直後、早期拡張期・急速充満期に生じる低周波音。40歳以上での出現は左室機能不全（心不全）を示唆する。"},
-      s4_gallop:   {label: "S4奔馬調律（拡張機能障害）", spec: {organ:"heart", hr:76, gallop:"S4"},
-                   desc: "S1の直前、心房収縮期に生じる低周波音。左室コンプライアンス低下（高血圧性心疾患等）で聴取される。"},
-      mr_murmur:   {label: "僧帽弁閉鎖不全（全収縮期雑音）", spec: {organ:"heart", hr:80,
-                   murmur:{timing:"systolic", shape:"plateau", fLow:250, fHigh:600, peak:0.35}},
-                   desc: "収縮期を通して一定の強さで持続する高調な雑音（plateau型）。心尖部で最強、腋窩へ放散する。"},
-      as_murmur:   {label: "大動脈弁狭窄（駆出性雑音）", spec: {organ:"heart", hr:70,
-                   murmur:{timing:"systolic", shape:"crescendo_decrescendo", fLow:150, fHigh:400, peak:0.4}},
-                   desc: "収縮中期にピークを持つダイヤモンド型（crescendo-decrescendo）の粗い雑音。右第2肋間で最強、頸部へ放散。"},
-      ar_murmur:   {label: "大動脈弁閉鎖不全（拡張期雑音）", spec: {organ:"heart", hr:78,
-                   murmur:{timing:"diastolic", shape:"decrescendo", fLow:300, fHigh:700, peak:0.28, durFrac:0.7}},
-                   desc: "S2直後に始まり減衰していく高調な吹鳴様雑音（decrescendo型）。前傾坐位・呼気時に増強。"},
-      ms_murmur:   {label: "僧帽弁狭窄（拡張期ランブル）", spec: {organ:"heart", hr:82,
-                   murmur:{timing:"diastolic", shape:"plateau", fLow:80, fHigh:200, peak:0.3, durFrac:0.55}},
-                   desc: "中期拡張期に聴かれる低調なゴロゴロ音（rumble）。心尖部でベル型聴診器・左側臥位で増強。"},
-      pda_murmur:  {label: "動脈管開存（連続性雑音）", spec: {organ:"heart", hr:96,
-                   murmur:{timing:"continuous", fLow:200, fHigh:500, peak:0.3}},
-                   desc: "収縮期から拡張期にかけて連続する機械様雑音（Gibson雑音）。左第2肋間で最強。"},
+      normal: {
+        label: {ja:"正常心音（S1・S2のみ）", en:"Normal heart sounds (S1/S2 only)", ko:"정상 심음(S1·S2)", zh:"正常心音（仅S1/S2）"},
+        spec: {organ:"heart", hr:72},
+        desc: {
+          ja: "S1（第1心音）は僧帽弁・三尖弁閉鎖に由来し低調で長め。S2（第2心音）は大動脈弁・肺動脈弁閉鎖に由来し高調で短め。",
+          en: "S1 arises from mitral/tricuspid valve closure — lower-pitched, longer. S2 arises from aortic/pulmonic valve closure — higher-pitched, shorter.",
+          ko: "S1(제1심음)은 승모판·삼첨판 폐쇄에서 기원하며 저음이고 김. S2(제2심음)는 대동맥판·폐동맥판 폐쇄에서 기원하며 고음이고 짧음.",
+          zh: "S1（第一心音）源自二尖瓣、三尖瓣关闭，音调低、时程较长。S2（第二心音）源自主动脉瓣、肺动脉瓣关闭，音调高、时程较短。",
+        }},
+      s3_gallop: {
+        label: {ja:"S3奔馬調律（心不全）", en:"S3 gallop (heart failure)", ko:"S3 심음(심부전)", zh:"S3奔马律（心力衰竭）"},
+        spec: {organ:"heart", hr:88, gallop:"S3"},
+        desc: {
+          ja: "S2の直後、早期拡張期・急速充満期に生じる低周波音。40歳以上での出現は左室機能不全（心不全）を示唆する。",
+          en: "A low-frequency sound just after S2, during early diastole / rapid filling. In patients over 40, it suggests left ventricular dysfunction (heart failure).",
+          ko: "S2 직후 초기 확장기·급속 충만기에 발생하는 저주파음. 40세 이상에서 청취되면 좌심실 기능부전(심부전)을 시사함.",
+          zh: "紧随S2之后，在舒张早期／快速充盈期出现的低频音。40岁以上人群出现常提示左心室功能不全（心力衰竭）。",
+        }},
+      s4_gallop: {
+        label: {ja:"S4奔馬調律（拡張機能障害）", en:"S4 gallop (diastolic dysfunction)", ko:"S4 심음(이완기능장애)", zh:"S4奔马律（舒张功能障碍）"},
+        spec: {organ:"heart", hr:76, gallop:"S4"},
+        desc: {
+          ja: "S1の直前、心房収縮期に生じる低周波音。左室コンプライアンス低下（高血圧性心疾患等）で聴取される。",
+          en: "A low-frequency sound just before S1, during atrial contraction. Heard with reduced LV compliance (e.g. hypertensive heart disease).",
+          ko: "S1 직전 심방 수축기에 발생하는 저주파음. 좌심실 컴플라이언스 저하(고혈압성 심질환 등)에서 청취됨.",
+          zh: "紧邻S1之前，在心房收缩期出现的低频音。见于左心室顺应性下降（如高血压性心脏病）。",
+        }},
+      mr_murmur: {
+        label: {ja:"僧帽弁閉鎖不全（全収縮期雑音）", en:"Mitral regurgitation (holosystolic murmur)", ko:"승모판 폐쇄부전(전수축기 잡음)", zh:"二尖瓣关闭不全（全收缩期杂音）"},
+        spec: {organ:"heart", hr:80, murmur:{timing:"systolic", shape:"plateau", fLow:250, fHigh:600, peak:0.35}},
+        desc: {
+          ja: "収縮期を通して一定の強さで持続する高調な雑音（plateau型）。心尖部で最強、腋窩へ放散する。",
+          en: "A high-pitched murmur of constant intensity throughout systole (plateau pattern). Loudest at the apex, radiating to the axilla.",
+          ko: "수축기 내내 일정한 강도로 지속되는 고음의 잡음(plateau형). 심첨부에서 가장 크게 들리며 액와부로 방사됨.",
+          zh: "收缩期内强度恒定、持续存在的高调杂音（平台型）。心尖部最响，向腋下传导。",
+        }},
+      as_murmur: {
+        label: {ja:"大動脈弁狭窄（駆出性雑音）", en:"Aortic stenosis (ejection murmur)", ko:"대동맥판 협착(구출성 잡음)", zh:"主动脉瓣狭窄（射血性杂音）"},
+        spec: {organ:"heart", hr:70, murmur:{timing:"systolic", shape:"crescendo_decrescendo", fLow:150, fHigh:400, peak:0.4}},
+        desc: {
+          ja: "収縮中期にピークを持つダイヤモンド型（crescendo-decrescendo）の粗い雑音。右第2肋間で最強、頸部へ放散。",
+          en: "A harsh diamond-shaped (crescendo-decrescendo) murmur peaking in mid-systole. Loudest at the right 2nd intercostal space, radiating to the neck.",
+          ko: "수축기 중반에 정점을 이루는 다이아몬드형(점증-점감형) 거친 잡음. 우측 제2늑간에서 가장 크게 들리며 경부로 방사됨.",
+          zh: "在收缩中期达峰的菱形（渐强渐弱型）粗糙杂音。右第二肋间最响，向颈部传导。",
+        }},
+      ar_murmur: {
+        label: {ja:"大動脈弁閉鎖不全（拡張期雑音）", en:"Aortic regurgitation (diastolic murmur)", ko:"대동맥판 폐쇄부전(확장기 잡음)", zh:"主动脉瓣关闭不全（舒张期杂音）"},
+        spec: {organ:"heart", hr:78, murmur:{timing:"diastolic", shape:"decrescendo", fLow:300, fHigh:700, peak:0.28, durFrac:0.7}},
+        desc: {
+          ja: "S2直後に始まり減衰していく高調な吹鳴様雑音（decrescendo型）。前傾坐位・呼気時に増強。",
+          en: "A high-pitched blowing murmur starting right after S2 and fading (decrescendo). Louder when leaning forward and on expiration.",
+          ko: "S2 직후 시작되어 점차 감쇠하는 고음의 취주음(점감형). 전방 굴곡 자세·호기 시 증강됨.",
+          zh: "紧接S2出现、逐渐减弱的高调吹风样杂音（渐弱型）。前倾坐位、呼气时增强。",
+        }},
+      ms_murmur: {
+        label: {ja:"僧帽弁狭窄（拡張期ランブル）", en:"Mitral stenosis (diastolic rumble)", ko:"승모판 협착(확장기 러블)", zh:"二尖瓣狭窄（舒张期隆隆样杂音）"},
+        spec: {organ:"heart", hr:82, murmur:{timing:"diastolic", shape:"plateau", fLow:80, fHigh:200, peak:0.3, durFrac:0.55}},
+        desc: {
+          ja: "中期拡張期に聴かれる低調なゴロゴロ音（rumble）。心尖部でベル型聴診器・左側臥位で増強。",
+          en: "A low-pitched rumbling sound heard in mid-diastole. Best heard at the apex with the bell, in the left lateral position.",
+          ko: "중기 확장기에 들리는 저음의 그르렁거리는 잡음(rumble). 심첨부에서 벨형 청진기·좌측와위로 증강됨.",
+          zh: "在舒张中期听到的低调隆隆样杂音。心尖部用钟形听诊器、左侧卧位时最清楚。",
+        }},
+      pda_murmur: {
+        label: {ja:"動脈管開存（連続性雑音）", en:"Patent ductus arteriosus (continuous murmur)", ko:"동맥관 개존(연속성 잡음)", zh:"动脉导管未闭（连续性杂音）"},
+        spec: {organ:"heart", hr:96, murmur:{timing:"continuous", fLow:200, fHigh:500, peak:0.3}},
+        desc: {
+          ja: "収縮期から拡張期にかけて連続する機械様雑音（Gibson雑音）。左第2肋間で最強。",
+          en: "A machine-like murmur continuing from systole through diastole (Gibson murmur). Loudest at the left 2nd intercostal space.",
+          ko: "수축기에서 확장기까지 이어지는 기계음 같은 연속성 잡음(Gibson 잡음). 좌측 제2늑간에서 가장 크게 들림.",
+          zh: "从收缩期延续到舒张期的机器样连续性杂音（Gibson杂音）。左第二肋间最响。",
+        }},
     }
   },
   lung: {
-    label: "呼吸音", points: ["lung_ru","lung_lu","lung_rm","lung_lm","lung_rl","lung_ll"],
+    label: {ja:"呼吸音", en:"Lung sounds", ko:"호흡음", zh:"呼吸音"},
+    points: ["lung_ru","lung_lu","lung_rm","lung_lm","lung_rl","lung_ll"],
     findings: {
-      normal:      {label: "正常呼吸音（肺胞呼吸音）", spec: {organ:"lung", rr:16, level:"vesicular"},
-                   desc: "吸気が呼気より長く明瞭に聴こえる、やわらかい風のような音。"},
-      decreased:   {label: "呼吸音減弱（COPD・無気肺等）", spec: {organ:"lung", rr:14, level:"decreased"},
-                   desc: "全体に音量が低下している状態。肺の過膨張、胸水、無気肺などで生じる。"},
-      bronchial:   {label: "気管支呼吸音（肺炎の硬化）", spec: {organ:"lung", rr:20, level:"bronchial"},
-                   desc: "本来は末梢で聴かれないはずの管状の音。肺炎による肺の硬化（consolidation）で聴取される。"},
-      crackle_fine:{label: "fine crackle（間質性肺疾患）", spec: {organ:"lung", rr:20, level:"vesicular", adventitious:"crackle_fine"},
-                   desc: "吸気終末に短時間・高周波のパチパチという断続音。肺線維症・間質性肺炎に典型的。"},
-      crackle_coarse:{label: "coarse crackle（肺炎・気管支拡張症）", spec: {organ:"lung", rr:22, level:"vesicular", adventitious:"crackle_coarse"},
-                   desc: "吸気早期からの低調で粗い断続音。気管支肺炎や気道内分泌物貯留で聴取される。"},
-      wheeze:      {label: "wheeze（喘息・COPD増悪）", spec: {organ:"lung", rr:24, level:"decreased", adventitious:"wheeze"},
-                   desc: "呼気優位の高調な連続性笛様音。気道狭窄を示唆する。"},
-      wheeze_severe:{label: "wheeze（重症・吸呼気両方）", spec: {organ:"lung", rr:28, level:"decreased", adventitious:"wheeze", severity:"severe"},
-                   desc: "吸気相にも笛様音が及ぶ状態。より高度な気道狭窄を示唆し、無音化（silent chest）に注意。"},
+      normal: {
+        label: {ja:"正常呼吸音（肺胞呼吸音）", en:"Normal (vesicular) breath sounds", ko:"정상 호흡음(폐포음)", zh:"正常呼吸音（肺泡呼吸音）"},
+        spec: {organ:"lung", rr:16, level:"vesicular"},
+        desc: {
+          ja: "吸気が呼気より長く明瞭に聴こえる、やわらかい風のような音。",
+          en: "A soft, wind-like sound; inspiration is longer and clearer than expiration.",
+          ko: "흡기가 호기보다 길고 뚜렷하게 들리는 부드러운 바람 소리 같은 음.",
+          zh: "柔和的风样音，吸气比呼气更长更清晰。",
+        }},
+      decreased: {
+        label: {ja:"呼吸音減弱（COPD・無気肺等）", en:"Decreased breath sounds (COPD, atelectasis, etc.)", ko:"호흡음 감소(COPD·무기폐 등)", zh:"呼吸音减弱（COPD、肺不张等）"},
+        spec: {organ:"lung", rr:14, level:"decreased"},
+        desc: {
+          ja: "全体に音量が低下している状態。肺の過膨張、胸水、無気肺などで生じる。",
+          en: "Overall reduced volume of breath sounds. Seen with hyperinflation, pleural effusion, or atelectasis.",
+          ko: "전반적으로 음량이 감소된 상태. 폐과팽창, 흉수, 무기폐 등에서 발생.",
+          zh: "整体音量降低的状态，见于肺过度充气、胸腔积液、肺不张等。",
+        }},
+      bronchial: {
+        label: {ja:"気管支呼吸音（肺炎の硬化）", en:"Bronchial breath sounds (consolidation)", ko:"기관지 호흡음(폐경화)", zh:"支气管呼吸音（肺实变）"},
+        spec: {organ:"lung", rr:20, level:"bronchial"},
+        desc: {
+          ja: "本来は末梢で聴かれないはずの管状の音。肺炎による肺の硬化（consolidation）で聴取される。",
+          en: "A tubular sound not normally heard peripherally. Heard over lung consolidation from pneumonia.",
+          ko: "본래 말초에서는 들리지 않아야 할 관형음. 폐렴에 의한 폐경화(consolidation)에서 청취됨.",
+          zh: "正常情况下不应在外周听到的管状音。见于肺炎导致的肺实变。",
+        }},
+      crackle_fine: {
+        label: {ja:"fine crackle（間質性肺疾患）", en:"Fine crackles (interstitial lung disease)", ko:"미세 수포음(간질성 폐질환)", zh:"细湿啰音（间质性肺疾病）"},
+        spec: {organ:"lung", rr:20, level:"vesicular", adventitious:"crackle_fine"},
+        desc: {
+          ja: "吸気終末に短時間・高周波のパチパチという断続音。肺線維症・間質性肺炎に典型的。",
+          en: "Brief, high-frequency crackling sounds at end-inspiration. Typical of pulmonary fibrosis and interstitial pneumonia.",
+          ko: "흡기 말기에 짧고 고주파인 '파직파직'하는 단속음. 폐섬유증·간질성 폐렴에서 전형적.",
+          zh: "吸气末出现的短暂、高频的爆裂音，肺纤维化、间质性肺炎的典型表现。",
+        }},
+      crackle_coarse: {
+        label: {ja:"coarse crackle（肺炎・気管支拡張症）", en:"Coarse crackles (pneumonia, bronchiectasis)", ko:"조대 수포음(폐렴·기관지확장증)", zh:"粗湿啰音（肺炎、支气管扩张症）"},
+        spec: {organ:"lung", rr:22, level:"vesicular", adventitious:"crackle_coarse"},
+        desc: {
+          ja: "吸気早期からの低調で粗い断続音。気管支肺炎や気道内分泌物貯留で聴取される。",
+          en: "Low-pitched, coarse crackling starting early in inspiration. Heard with bronchopneumonia or retained airway secretions.",
+          ko: "흡기 초기부터 시작되는 저음의 거친 단속음. 기관지폐렴이나 기도 내 분비물 저류에서 청취됨.",
+          zh: "吸气早期开始的低调粗糙断续音，见于支气管肺炎或气道分泌物潴留。",
+        }},
+      wheeze: {
+        label: {ja:"wheeze（喘息・COPD増悪）", en:"Wheeze (asthma, COPD exacerbation)", ko:"천명음(천식·COPD 악화)", zh:"哮鸣音（哮喘、COPD急性加重）"},
+        spec: {organ:"lung", rr:24, level:"decreased", adventitious:"wheeze"},
+        desc: {
+          ja: "呼気優位の高調な連続性笛様音。気道狭窄を示唆する。",
+          en: "A high-pitched, continuous whistling sound, more prominent on expiration. Suggests airway narrowing.",
+          ko: "호기 우세의 고음 연속성 휘파람 같은 음. 기도 협착을 시사함.",
+          zh: "以呼气为主的高调连续性哨笛样音，提示气道狭窄。",
+        }},
+      wheeze_severe: {
+        label: {ja:"wheeze（重症・吸呼気両方）", en:"Wheeze (severe, biphasic)", ko:"천명음(중증, 흡호기 모두)", zh:"哮鸣音（重症，吸呼气均有）"},
+        spec: {organ:"lung", rr:28, level:"decreased", adventitious:"wheeze", severity:"severe"},
+        desc: {
+          ja: "吸気相にも笛様音が及ぶ状態。より高度な気道狭窄を示唆し、無音化（silent chest）に注意。",
+          en: "Wheezing extends into inspiration as well — suggests more severe airway narrowing. Watch for a silent chest.",
+          ko: "흡기상에도 휘파람음이 미치는 상태. 더 심한 기도 협착을 시사하며, 무음 흉부(silent chest)에 주의.",
+          zh: "哮鸣音扩展至吸气相，提示更严重的气道狭窄，需警惕\"沉默肺\"（silent chest）。",
+        }},
     }
   },
   bowel: {
-    label: "腸雑音", points: ["ruq","luq","rlq","llq"],
+    label: {ja:"腸雑音", en:"Bowel sounds", ko:"장음", zh:"肠鸣音"},
+    points: ["ruq","luq","rlq","llq"],
     findings: {
-      normal:      {label: "正常腸雑音", spec: {organ:"bowel", kind:"normal"},
-                   desc: "5〜30秒ごとに短いクリック音・グルグル音が不規則に聴かれる。"},
-      hyperactive: {label: "腸雑音亢進", spec: {organ:"bowel", kind:"hyperactive"},
-                   desc: "頻回で大きな腸雑音。下痢・初期の腸閉塞・消化管出血などで見られる。"},
-      hypoactive:  {label: "腸雑音減弱", spec: {organ:"bowel", kind:"hypoactive"},
-                   desc: "腸雑音の頻度・音量が低下。術後早期・麻痺性イレウスの初期像。"},
-      absent:      {label: "腸雑音消失（イレウス）", spec: {organ:"bowel", kind:"absent"},
-                   desc: "実際の診察では最低1分間（できれば数分間）聴取して消失を確認する。麻痺性イレウス・腹膜炎を示唆。"},
-      obstructive: {label: "金属性腸音（機械的腸閉塞）", spec: {organ:"bowel", kind:"obstructive"},
-                   desc: "高調で反響するような金属性・tinkling音。拡張した腸管内を液体・ガスが通過する際に生じ、機械的腸閉塞を示唆する。"},
+      normal: {
+        label: {ja:"正常腸雑音", en:"Normal bowel sounds", ko:"정상 장음", zh:"正常肠鸣音"},
+        spec: {organ:"bowel", kind:"normal"},
+        desc: {
+          ja: "5〜30秒ごとに短いクリック音・グルグル音が不規則に聴かれる。",
+          en: "Short clicks and gurgles heard irregularly every 5–30 seconds.",
+          ko: "5~30초 간격으로 짧은 클릭음·꾸르륵음이 불규칙하게 들림.",
+          zh: "每5–30秒不规则出现的短促咔嗒声和咕噜声。",
+        }},
+      hyperactive: {
+        label: {ja:"腸雑音亢進", en:"Hyperactive bowel sounds", ko:"장음 항진", zh:"肠鸣音亢进"},
+        spec: {organ:"bowel", kind:"hyperactive"},
+        desc: {
+          ja: "頻回で大きな腸雑音。下痢・腸閉塞の早期・消化管出血などで見られる。",
+          en: "Frequent, loud bowel sounds. Seen with diarrhea, early mechanical bowel obstruction, or GI bleeding.",
+          ko: "빈번하고 큰 장음. 설사·장폐색 초기·소화관 출혈 등에서 나타남.",
+          zh: "频繁而响亮的肠鸣音，见于腹泻、肠梗阻早期、消化道出血等。",
+        }},
+      hypoactive: {
+        label: {ja:"腸雑音減弱", en:"Hypoactive bowel sounds", ko:"장음 감소", zh:"肠鸣音减弱"},
+        spec: {organ:"bowel", kind:"hypoactive"},
+        desc: {
+          ja: "腸雑音の頻度・音量が低下。術後早期・イレウス（麻痺性）の初期像。",
+          en: "Reduced frequency and volume of bowel sounds. Seen early after surgery and in early (paralytic) ileus.",
+          ko: "장음의 빈도·음량이 감소. 수술 직후·이레우스(마비성)의 초기 소견.",
+          zh: "肠鸣音频率与音量降低。见于术后早期、麻痺性肠梗阻（ileus）早期表现。",
+        }},
+      absent: {
+        label: {ja:"腸雑音消失（イレウス）", en:"Absent bowel sounds (paralytic ileus)", ko:"장음 소실(이레우스, 마비성)", zh:"肠鸣音消失（麻痹性肠梗阻/ileus）"},
+        spec: {organ:"bowel", kind:"absent"},
+        desc: {
+          ja: "実際の診察では最低1分間（できれば数分間）聴取して消失を確認する。イレウス（麻痺性）・腹膜炎を示唆する。「イレウス」は本アプリでは機能性（麻痺性）腸管麻痺のみを指し、機械的腸閉塞とは区別する。",
+          en: "In real practice, listen for at least one minute (ideally several) to confirm absence. Suggests paralytic ileus or peritonitis. In this app, \"ileus\" always refers specifically to functional (paralytic) bowel paralysis, distinct from mechanical bowel obstruction.",
+          ko: "실제 진료에서는 최소 1분(가능하면 수분간) 청진하여 소실을 확인함. 이레우스(마비성)·복막염을 시사함. 본 앱에서 '이레우스'는 기능성(마비성) 장마비만을 가리키며 기계적 장폐색과는 구별함.",
+          zh: "实际临床中需至少听诊1分钟（最好数分钟）以确认肠鸣音消失。提示麻痺性肠梗阻（ileus）或腹膜炎。本应用中\"ileus/肠梗阻\"一词专指功能性（麻痹性）肠麻痹，与机械性肠梗阻（bowel obstruction）严格区分。",
+        }},
+      obstructive: {
+        label: {ja:"金属性腸音（腸閉塞）", en:"High-pitched tinkling sounds (mechanical bowel obstruction)", ko:"금속성 장음(장폐색)", zh:"金属音（机械性肠梗阻）"},
+        spec: {organ:"bowel", kind:"obstructive"},
+        desc: {
+          ja: "高調で反響するような金属性・tinkling音。拡張した腸管内を液体・ガスが通過する際に生じ、腸閉塞（機械的）を示唆する。この所見は「イレウス」とは呼ばない。",
+          en: "High-pitched, echoing, metallic \"tinkling\" sounds produced as fluid and gas pass through a dilated bowel loop. Suggests mechanical bowel obstruction — this is not called \"ileus\" in this app.",
+          ko: "고음이며 울리는 듯한 금속성·tinkling음. 확장된 장관 내로 액체·가스가 통과할 때 발생하며 장폐색(기계적)을 시사함. 이 소견은 '이레우스'라 부르지 않음.",
+          zh: "高调、带回响的金属样\"叮当\"音，由液体和气体通过扩张肠袢产生，提示机械性肠梗阻。本应用中该表现不称为\"ileus\"。",
+        }},
     }
   },
   vascular: {
-    label: "血管雑音", points: ["carotid_r","carotid_l"],
+    label: {ja:"血管雑音", en:"Vascular sounds", ko:"혈관잡음", zh:"血管杂音"},
+    points: ["carotid_r","carotid_l"],
     findings: {
-      normal:   {label: "血管雑音なし", spec: {organ:"vascular", hr:72, peak:0.0},
-                desc: "正常では頸動脈に雑音は聴取されない（心音の伝達音のみ）。"},
-      mild:     {label: "頸動脈雑音（軽度〜中等度狭窄）", spec: {organ:"vascular", hr:72, peak:0.3},
-                desc: "収縮期に一致した高調な雑音。狭窄度50%以上で出現するとされる。感度は高くないが特異度は高い所見。"},
-      severe:   {label: "頸動脈雑音（高度狭窄・連続性）", spec: {organ:"vascular", hr:78, peak:0.32, severity:"severe"},
-                desc: "収縮期を超えて拡張期にも及ぶ連続性の雑音。高度狭窄を示唆するが、90%を超える超高度狭窄ではかえって消失することがある。"},
+      normal: {
+        label: {ja:"血管雑音なし", en:"No bruit", ko:"혈관잡음 없음", zh:"无血管杂音"},
+        spec: {organ:"vascular", hr:72, peak:0.0},
+        desc: {
+          ja: "正常では頸動脈に雑音は聴取されない（心音の伝達音のみ）。",
+          en: "Normally no bruit is heard over the carotid (only transmitted heart sounds).",
+          ko: "정상에서는 경동맥에서 잡음이 들리지 않음(심음 전달음만 존재).",
+          zh: "正常情况下颈动脉听不到杂音（仅可闻及传导的心音）。",
+        }},
+      mild: {
+        label: {ja:"頸動脈雑音（軽度〜中等度狭窄）", en:"Carotid bruit (mild-to-moderate stenosis)", ko:"경동맥 잡음(경도~중등도 협착)", zh:"颈动脉杂音（轻至中度狭窄）"},
+        spec: {organ:"vascular", hr:72, peak:0.3},
+        desc: {
+          ja: "収縮期に一致した高調な雑音。狭窄度50%以上で出現するとされる。感度は高くないが特異度は高い所見。",
+          en: "A high-pitched murmur synchronous with systole. Reported to appear with ≥50% stenosis. Low sensitivity but high specificity.",
+          ko: "수축기와 일치하는 고음의 잡음. 협착도 50% 이상에서 나타난다고 알려짐. 민감도는 낮으나 특이도는 높은 소견.",
+          zh: "与收缩期同步的高调杂音，据报道在狭窄程度≥50%时出现。敏感度不高但特异度较高。",
+        }},
+      severe: {
+        label: {ja:"頸動脈雑音（高度狭窄・連続性）", en:"Carotid bruit (severe stenosis, continuous)", ko:"경동맥 잡음(고도 협착, 연속성)", zh:"颈动脉杂音（重度狭窄，连续性）"},
+        spec: {organ:"vascular", hr:78, peak:0.32, severity:"severe"},
+        desc: {
+          ja: "収縮期を超えて拡張期にも及ぶ連続性の雑音。高度狭窄を示唆するが、90%を超える超高度狭窄ではかえって消失することがある。",
+          en: "A continuous murmur extending beyond systole into diastole. Suggests severe stenosis, though it may paradoxically disappear with stenosis exceeding ~90%.",
+          ko: "수축기를 넘어 확장기까지 이어지는 연속성 잡음. 고도 협착을 시사하나, 90%를 초과하는 초고도 협착에서는 오히려 소실될 수 있음.",
+          zh: "延续超过收缩期、进入舒张期的连续性杂音，提示重度狭窄；但狭窄超过约90%时杂音反而可能消失。",
+        }},
     }
   },
 };
 
-/* --- 自由練習モードのUI配線 --- */
+/* ============================================================================
+   OSCE症例バンク — 多言語
+============================================================================ */
+const OSCE_CASES = [
+  {
+    id: "OSCE-01",
+    vignette: {
+      ja: "68歳男性。半年前からの労作時息切れと胸部圧迫感を主訴に来院。",
+      en: "A 68-year-old man presents with 6 months of exertional dyspnea and chest tightness.",
+      ko: "68세 남성. 6개월 전부터의 노작성 호흡곤란과 흉부 압박감을 주소로 내원.",
+      zh: "68岁男性，主诉半年来活动后气短及胸闷就诊。",
+    },
+    findings: {
+      aortic: {spec: {organ:"heart", hr:70, murmur:{timing:"systolic", shape:"crescendo_decrescendo", fLow:150, fHigh:400, peak:0.4}}},
+      pulmonic: {spec: {organ:"heart", hr:70}},
+      tricuspid: {spec: {organ:"heart", hr:70}},
+      mitral: {spec: {organ:"heart", hr:70}},
+    },
+    diagnosis: {
+      ja: "大動脈弁狭窄症", en: "Aortic stenosis",
+      ko: "대동맥판 협착증", zh: "主动脉瓣狭窄",
+    },
+    rubric: [
+      {label:{ja:"雑音の性状",en:"Murmur character",ko:"잡음의 성상",zh:"杂音性质"}, points:2,
+       keywords:{ja:[["収縮期","雑音"],["駆出性"],"crescendo",["ダイヤモンド"]],
+                 en:["systolic murmur","crescendo-decrescendo","ejection murmur","diamond"],
+                 ko:[["수축기","잡음"],["구출성"],["점증"],["다이아몬드"]],
+                 zh:[["收缩期","杂音"],["射血性"],["渐强"],["菱形"]]}},
+      {label:{ja:"部位",en:"Location",ko:"부위",zh:"部位"}, points:1,
+       keywords:{ja:[["大動脈弁","領域"],"第2肋間","右第2肋間"],
+                 en:["aortic area","2nd intercostal","right 2nd intercostal"],
+                 ko:[["대동맥판","영역"],"제2늑간","우측 제2늑간"],
+                 zh:[["主动脉瓣","区"],"第二肋间","右第二肋间"]}},
+      {label:{ja:"具体的病態",en:"Diagnosis",ko:"구체적 병태",zh:"具体病因"}, points:2,
+       keywords:{ja:["大動脈弁狭窄","AS"], en:["aortic stenosis","AS"],
+                 ko:["대동맥판 협착","AS"], zh:["主动脉瓣狭窄","AS"]}},
+    ],
+  },
+  {
+    id: "OSCE-02",
+    vignette: {
+      ja: "74歳女性。慢性心不全の既往。3日前からの呼吸困難増悪で救急受診。",
+      en: "A 74-year-old woman with chronic heart failure presents with worsening dyspnea over 3 days.",
+      ko: "74세 여성. 만성 심부전 과거력. 3일 전부터 악화된 호흡곤란으로 응급실 내원.",
+      zh: "74岁女性，有慢性心力衰竭病史，因3天来呼吸困难加重急诊就诊。",
+    },
+    findings: {
+      mitral: {spec: {organ:"heart", hr:96, gallop:"S3"}},
+      lung_rl: {spec: {organ:"lung", rr:24, level:"vesicular", adventitious:"crackle_coarse"}},
+      lung_ll: {spec: {organ:"lung", rr:24, level:"vesicular", adventitious:"crackle_coarse"}},
+    },
+    diagnosis: {
+      ja: "うっ血性心不全", en: "Congestive heart failure",
+      ko: "울혈성 심부전", zh: "充血性心力衰竭",
+    },
+    rubric: [
+      {label:{ja:"心音所見",en:"Heart sound",ko:"심음 소견",zh:"心音所见"}, points:2,
+       keywords:{ja:["S3","奔馬調律","ギャロップ"], en:["S3","gallop"],
+                 ko:["S3","심음","갤럽"], zh:["S3","奔马律"]}},
+      {label:{ja:"肺野所見",en:"Lung finding",ko:"폐 소견",zh:"肺部所见"}, points:2,
+       keywords:{ja:["両側",["crackle","coarse"],"水泡音","ラ音"],
+                 en:["bilateral","coarse crackles","rales"],
+                 ko:["양측",["수포음","조대"],"라음"],
+                 zh:["双侧",["湿啰音","粗"],"啰音"]}},
+      {label:{ja:"具体的病態",en:"Diagnosis",ko:"구체적 병태",zh:"具体病因"}, points:1,
+       keywords:{ja:["心不全","うっ血性心不全","肺水腫"],
+                 en:["heart failure","congestive heart failure","pulmonary edema"],
+                 ko:["심부전","울혈성 심부전","폐부종"],
+                 zh:["心力衰竭","充血性心力衰竭","肺水肿"]}},
+    ],
+  },
+  {
+    id: "OSCE-03",
+    vignette: {
+      ja: "45歳男性。3日前からの発熱・膿性痰・右胸痛を主訴に来院。",
+      en: "A 45-year-old man presents with 3 days of fever, purulent sputum, and right-sided chest pain.",
+      ko: "45세 남성. 3일 전부터 발열·화농성 객담·우측 흉통을 주소로 내원.",
+      zh: "45岁男性，主诉3天来发热、脓痰及右胸痛就诊。",
+    },
+    findings: {
+      lung_rm: {spec: {organ:"lung", rr:22, level:"bronchial"}},
+      lung_rl: {spec: {organ:"lung", rr:22, level:"bronchial"}},
+      lung_lu: {spec: {organ:"lung", rr:22, level:"vesicular"}},
+    },
+    diagnosis: {
+      ja: "右肺炎（肺実質の硬化）", en: "Right-sided pneumonia (consolidation)",
+      ko: "우측 폐렴(폐실질 경화)", zh: "右肺肺炎（肺实变）",
+    },
+    rubric: [
+      {label:{ja:"肺音の性状",en:"Breath sound character",ko:"폐음의 성상",zh:"呼吸音性质"}, points:2,
+       keywords:{ja:["気管支呼吸音","管状音"], en:["bronchial breath sounds","tubular"],
+                 ko:["기관지 호흡음","관형음"], zh:["支气管呼吸音","管状音"]}},
+      {label:{ja:"部位の左右差",en:"Laterality",ko:"좌우 차이",zh:"左右差异"}, points:1,
+       keywords:{ja:["右","左右差"], en:["right","asymmetric","unilateral"],
+                 ko:["우측","좌우 차이"], zh:["右侧","左右不对称"]}},
+      {label:{ja:"具体的病態",en:"Diagnosis",ko:"구체적 병태",zh:"具体病因"}, points:2,
+       keywords:{ja:["肺炎","硬化","consolidation"], en:["pneumonia","consolidation"],
+                 ko:["폐렴","경화"], zh:["肺炎","实变"]}},
+    ],
+  },
+  {
+    id: "OSCE-04",
+    vignette: {
+      ja: "22歳女性。気管支喘息の既往。夜間の突然の呼吸困難・喘鳴で救急受診。",
+      en: "A 22-year-old woman with a history of asthma presents with sudden nocturnal dyspnea and wheezing.",
+      ko: "22세 여성. 기관지 천식 과거력. 야간에 갑작스런 호흡곤란·천명으로 응급실 내원.",
+      zh: "22岁女性，有支气管哮喘病史，因夜间突发呼吸困难、喘息急诊就诊。",
+    },
+    findings: {
+      lung_ru: {spec: {organ:"lung", rr:26, level:"decreased", adventitious:"wheeze", severity:"severe"}},
+      lung_lu: {spec: {organ:"lung", rr:26, level:"decreased", adventitious:"wheeze", severity:"severe"}},
+      lung_rl: {spec: {organ:"lung", rr:26, level:"decreased", adventitious:"wheeze"}},
+      lung_ll: {spec: {organ:"lung", rr:26, level:"decreased", adventitious:"wheeze"}},
+    },
+    diagnosis: {
+      ja: "気管支喘息発作", en: "Acute asthma exacerbation",
+      ko: "기관지 천식 발작", zh: "支气管哮喘急性发作",
+    },
+    rubric: [
+      {label:{ja:"副雑音の性状",en:"Adventitious sound",ko:"부잡음의 성상",zh:"附加音性质"}, points:2,
+       keywords:{ja:["wheeze","笛様音",["連続性","高調"]], en:["wheeze","whistling"],
+                 ko:["천명음","휘파람"], zh:["哮鸣音","哨笛样"]}},
+      {label:{ja:"分布",en:"Distribution",ko:"분포",zh:"分布"}, points:1,
+       keywords:{ja:["両側",["吸気","呼気"]], en:["bilateral",["inspiration","expiration"]],
+                 ko:["양측",["흡기","호기"]], zh:["双侧",["吸气","呼气"]]}},
+      {label:{ja:"具体的病態",en:"Diagnosis",ko:"구체적 병태",zh:"具体病因"}, points:2,
+       keywords:{ja:["喘息","気管支喘息"], en:["asthma"], ko:["천식"], zh:["哮喘"]}},
+    ],
+  },
+  {
+    id: "OSCE-05",
+    vignette: {
+      ja: "70歳男性。開腹手術の既往。2日前からの腹部膨満・悪心嘔吐・排ガス停止。",
+      en: "A 70-year-old man with a history of open abdominal surgery presents with 2 days of abdominal distension, nausea/vomiting, and no flatus.",
+      ko: "70세 남성. 개복수술 과거력. 2일 전부터 복부 팽만·오심 구토·가스 배출 중단.",
+      zh: "70岁男性，有开腹手术史，2天来腹胀、恶心呕吐、停止排气。",
+    },
+    findings: {
+      ruq: {spec: {organ:"bowel", kind:"obstructive"}},
+      luq: {spec: {organ:"bowel", kind:"obstructive"}},
+      rlq: {spec: {organ:"bowel", kind:"hyperactive"}},
+      llq: {spec: {organ:"bowel", kind:"obstructive"}},
+    },
+    diagnosis: {
+      ja: "癒着性腸閉塞（機械的）",
+      en: "Adhesive bowel obstruction (mechanical)",
+      ko: "유착성 장폐색(기계적)",
+      zh: "粘连性肠梗阻（机械性）",
+    },
+    rubric: [
+      {label:{ja:"腸雑音の性状",en:"Bowel sound character",ko:"장음의 성상",zh:"肠鸣音性质"}, points:2,
+       keywords:{ja:["金属性","高調","tinkling","反響"],
+                 en:["metallic","tinkling","high-pitched"],
+                 ko:["금속성","고음","tinkling"],
+                 zh:["金属音","高调","叮当"]}},
+      {label:{ja:"腸雑音の頻度",en:"Frequency",ko:"장음 빈도",zh:"肠鸣音频率"}, points:1,
+       keywords:{ja:["亢進","頻回"], en:["hyperactive","frequent","increased"],
+                 ko:["항진","빈번"], zh:["亢进","频繁"]}},
+      {label:{ja:"具体的病態（用語に注意）",en:"Diagnosis (note terminology)",ko:"구체적 병태(용어 주의)",zh:"具体病因（注意术语）"}, points:2,
+       keywords:{ja:["腸閉塞","腸管閉塞","機械的腸閉塞"],
+                 en:["bowel obstruction","mechanical obstruction","intestinal obstruction"],
+                 ko:["장폐색","기계적 장폐색"],
+                 zh:["肠梗阻","机械性肠梗阻"]}},
+    ],
+  },
+  {
+    id: "OSCE-06",
+    vignette: {
+      ja: "80歳女性。開腹術後3日目。排ガス・排便なく腹部膨満が持続。",
+      en: "An 80-year-old woman, postoperative day 3 after open abdominal surgery, with persistent distension and no flatus or bowel movement.",
+      ko: "80세 여성. 개복수술 후 3일째. 가스·배변 없이 복부 팽만 지속.",
+      zh: "80岁女性，开腹手术后第3天，持续腹胀，无排气排便。",
+    },
+    findings: {
+      ruq: {spec: {organ:"bowel", kind:"absent"}},
+      luq: {spec: {organ:"bowel", kind:"absent"}},
+      rlq: {spec: {organ:"bowel", kind:"absent"}},
+      llq: {spec: {organ:"bowel", kind:"absent"}},
+    },
+    diagnosis: {
+      ja: "イレウス（麻痺性）", en: "Ileus (paralytic)",
+      ko: "이레우스(마비성)", zh: "麻痹性肠梗阻（ileus）",
+    },
+    rubric: [
+      {label:{ja:"腸雑音の有無",en:"Presence of bowel sounds",ko:"장음 유무",zh:"肠鸣音有无"}, points:2,
+       keywords:{ja:["消失","聴取できない","無音"],
+                 en:["absent","no bowel sounds","silent"],
+                 ko:["소실","청취되지 않","무음"],
+                 zh:["消失","听不到","无肠鸣音"]}},
+      {label:{ja:"聴取の作法",en:"Auscultation technique",ko:"청진 방법",zh:"听诊方法"}, points:1,
+       keywords:{ja:["1分間","十分な時間","数分"],
+                 en:["one minute","full minute","several minutes"],
+                 ko:["1분","충분한 시간","수분"],
+                 zh:["一分钟","足够时间","数分钟"]}},
+      {label:{ja:"具体的病態（用語に注意）",en:"Diagnosis (note terminology)",ko:"구체적 병태(용어 주의)",zh:"具体病因（注意术语）"}, points:2,
+       keywords:{ja:["イレウス","麻痺性イレウス"],
+                 en:["ileus","paralytic ileus"],
+                 ko:["이레우스","마비성 이레우스"],
+                 zh:["麻痹性肠梗阻","ileus"]}},
+    ],
+  },
+  {
+    id: "OSCE-07",
+    vignette: {
+      ja: "66歳男性。高血圧・喫煙歴あり。昨日、一過性の右上肢脱力と構音障害があり受診。",
+      en: "A 66-year-old man with hypertension and a smoking history presents after a transient episode of right-arm weakness and dysarthria yesterday.",
+      ko: "66세 남성. 고혈압·흡연력 있음. 어제 일과성 우측 상지 위약과 구음장애가 있어 내원.",
+      zh: "66岁男性，有高血压、吸烟史，昨日出现一过性右上肢无力及构音障碍就诊。",
+    },
+    findings: {
+      carotid_l: {spec: {organ:"vascular", hr:74, peak:0.3}},
+      carotid_r: {spec: {organ:"vascular", hr:74, peak:0.0}},
+    },
+    diagnosis: {
+      ja: "左頸動脈狭窄症（一過性脳虚血発作の原因検索）",
+      en: "Left carotid artery stenosis (evaluation for TIA)",
+      ko: "좌측 경동맥 협착증(일과성 허혈발작 원인 검색)",
+      zh: "左颈动脉狭窄（短暂性脑缺血发作病因排查）",
+    },
+    rubric: [
+      {label:{ja:"雑音の有無・側性",en:"Presence and laterality",ko:"잡음 유무·측성",zh:"杂音有无及侧别"}, points:2,
+       keywords:{ja:["左","頸動脈雑音"], en:["left","carotid bruit"],
+                 ko:["좌측","경동맥 잡음"], zh:["左侧","颈动脉杂音"]}},
+      {label:{ja:"雑音のタイミング",en:"Timing",ko:"잡음의 시기",zh:"杂音时相"}, points:1,
+       keywords:{ja:["収縮期"], en:["systolic"], ko:["수축기"], zh:["收缩期"]}},
+      {label:{ja:"具体的病態",en:"Diagnosis",ko:"구체적 병태",zh:"具体病因"}, points:2,
+       keywords:{ja:["頸動脈狭窄","TIA","一過性脳虚血"],
+                 en:["carotid stenosis","TIA","transient ischemic attack"],
+                 ko:["경동맥 협착","TIA","일과성 뇌허혈"],
+                 zh:["颈动脉狭窄","TIA","短暂性脑缺血"]}},
+    ],
+  },
+];
+
+/* ============================================================================
+   自由練習モードのUI配線
+============================================================================ */
 const selOrgan = document.getElementById("selOrgan");
 const selFinding = document.getElementById("selFinding");
 const findingDesc = document.getElementById("findingDesc");
 
-for (const key in FINDING_LIBRARY) {
-  const opt = document.createElement("option");
-  opt.value = key; opt.textContent = FINDING_LIBRARY[key].label;
-  selOrgan.appendChild(opt);
+function populateOrganSelect() {
+  selOrgan.innerHTML = "";
+  for (const key in FINDING_LIBRARY) {
+    const opt = document.createElement("option");
+    opt.value = key; opt.textContent = tf(FINDING_LIBRARY[key].label);
+    selOrgan.appendChild(opt);
+  }
 }
 function populateFindings() {
   const organ = selOrgan.value;
@@ -561,7 +1028,7 @@ function populateFindings() {
   const findings = FINDING_LIBRARY[organ].findings;
   for (const fkey in findings) {
     const opt = document.createElement("option");
-    opt.value = fkey; opt.textContent = findings[fkey].label;
+    opt.value = fkey; opt.textContent = tf(findings[fkey].label);
     selFinding.appendChild(opt);
   }
   updateDesc();
@@ -569,9 +1036,9 @@ function populateFindings() {
 }
 function updateDesc() {
   const organ = selOrgan.value, fkey = selFinding.value;
-  const f = FINDING_LIBRARY[organ].findings[fkey];
+  const f = FINDING_LIBRARY[organ] && FINDING_LIBRARY[organ].findings[fkey];
   if (!f) return;
-  findingDesc.innerHTML = `<h3>${f.label}</h3>${f.desc}`;
+  findingDesc.innerHTML = `<h3>${tf(f.label)}</h3>${tf(f.desc)}`;
   findingDesc.classList.add("show");
 }
 function highlightRelevantPoints() {
@@ -583,156 +1050,67 @@ function highlightRelevantPoints() {
 }
 selOrgan.addEventListener("change", populateFindings);
 selFinding.addEventListener("change", updateDesc);
-populateFindings();
+
+/* --- リンク取得（機能②：個別所見の共有／埋め込みリンク） --- */
+document.getElementById("getLinkBtn").addEventListener("click", () => {
+  const url = new URL(location.href.split("?")[0]);
+  url.searchParams.set("embed", "1");
+  url.searchParams.set("lang", lang);
+  url.searchParams.set("organ", selOrgan.value);
+  url.searchParams.set("finding", selFinding.value);
+  const link = url.toString();
+  const status = document.getElementById("linkStatus");
+  if (navigator.clipboard && navigator.clipboard.writeText) {
+    navigator.clipboard.writeText(link).then(() => {
+      status.textContent = t("linkCopied") + "： " + link;
+      status.classList.add("show");
+      setTimeout(() => status.classList.remove("show"), 4000);
+    }).catch(() => { prompt("URL:", link); });
+  } else {
+    prompt("URL:", link);
+  }
+});
 
 /* --- ホバーで再生（両モード共通） --- */
-let mode = "practice"; // practice | osce
+let mode = "practice";
 let currentCase = null;
 let checkedPoints = new Set();
 
-document.querySelectorAll(".landmark").forEach(g => {
-  g.addEventListener("mouseenter", () => {
-    const key = g.dataset.key;
-    let spec = null, label = LANDMARKS[key].label;
-    if (mode === "practice") {
-      const organ = selOrgan.value;
-      if (!FINDING_LIBRARY[organ].points.includes(key)) return;
-      spec = FINDING_LIBRARY[organ].findings[selFinding.value].spec;
-    } else if (mode === "osce" && currentCase) {
-      const f = currentCase.findings[key];
-      if (!f) return;
-      spec = f.spec;
-      checkedPoints.add(key);
-      g.classList.add("checked");
-      updateChecklist();
-    }
-    if (!spec) return;
-    g.classList.add("active");
-    document.getElementById("nowPlaying").innerHTML =
-      `<span class="loc">聴診中：</span>${label}`;
-    startLoop(spec);
+function attachLandmarkHandlers() {
+  document.querySelectorAll(".landmark").forEach(g => {
+    g.addEventListener("mouseenter", () => {
+      const key = g.dataset.key;
+      let spec = null;
+      const label = tf(LANDMARKS[key].label);
+      if (mode === "practice") {
+        const organ = selOrgan.value;
+        if (!FINDING_LIBRARY[organ].points.includes(key)) return;
+        spec = FINDING_LIBRARY[organ].findings[selFinding.value].spec;
+      } else if (mode === "osce" && currentCase) {
+        const f = currentCase.findings[key];
+        if (!f) return;
+        spec = f.spec;
+        checkedPoints.add(key);
+        g.classList.add("checked");
+        updateChecklist();
+      }
+      if (!spec) return;
+      g.classList.add("active");
+      document.getElementById("nowPlaying").innerHTML =
+        `<span class="loc">${t("listening")}</span>${label}`;
+      startLoop(spec);
+    });
+    g.addEventListener("mouseleave", () => {
+      g.classList.remove("active");
+      stopLoop();
+      document.getElementById("nowPlaying").textContent = t("hoverHint");
+    });
   });
-  g.addEventListener("mouseleave", () => {
-    g.classList.remove("active");
-    stopLoop();
-    document.getElementById("nowPlaying").textContent = "部位にマウスを重ねると聴診音が再生されます";
-  });
-});
+}
 
 /* ============================================================================
-   OSCEモード：症例バンク
+   OSCEモード ロジック
 ============================================================================ */
-const OSCE_CASES = [
-  {
-    id: "OSCE-01", label: "68歳男性、労作時息切れ",
-    vignette: "68歳男性。半年前からの労作時息切れと胸部圧迫感を主訴に来院。",
-    findings: {
-      aortic: {spec: {organ:"heart", hr:70, murmur:{timing:"systolic", shape:"crescendo_decrescendo", fLow:150, fHigh:400, peak:0.4}}},
-      pulmonic: {spec: {organ:"heart", hr:70}},
-      tricuspid: {spec: {organ:"heart", hr:70}},
-      mitral: {spec: {organ:"heart", hr:70}},
-    },
-    diagnosis: "大動脈弁狭窄症",
-    rubric: [
-      {label:"雑音の性状", points:2, keywords:[["収縮期","雑音"],["駆出性"],["crescendo"],["ダイヤモンド"]]},
-      {label:"部位", points:1, keywords:[["大動脈弁","領域"],["第2肋間"],["右第2肋間"]]},
-      {label:"具体的病態", points:2, keywords:["大動脈弁狭窄","AS","aortic stenosis"]},
-    ],
-  },
-  {
-    id: "OSCE-02", label: "74歳女性、心不全増悪",
-    vignette: "74歳女性。慢性心不全の既往。3日前からの呼吸困難増悪で救急受診。",
-    findings: {
-      mitral: {spec: {organ:"heart", hr:96, gallop:"S3"}},
-      lung_rl: {spec: {organ:"lung", rr:24, level:"vesicular", adventitious:"crackle_coarse"}},
-      lung_ll: {spec: {organ:"lung", rr:24, level:"vesicular", adventitious:"crackle_coarse"}},
-    },
-    diagnosis: "うっ血性心不全",
-    rubric: [
-      {label:"心音所見", points:2, keywords:[["S3"],["奔馬調律"],["ギャロップ"]]},
-      {label:"肺野所見", points:2, keywords:[["両側"],["crackle","coarse"],["水泡音"],["ラ音"]]},
-      {label:"具体的病態", points:1, keywords:["心不全","うっ血性心不全","肺水腫"]},
-    ],
-  },
-  {
-    id: "OSCE-03", label: "45歳男性、発熱・咳嗽",
-    vignette: "45歳男性。3日前からの発熱・膿性痰・右胸痛を主訴に来院。",
-    findings: {
-      lung_rm: {spec: {organ:"lung", rr:22, level:"bronchial"}},
-      lung_rl: {spec: {organ:"lung", rr:22, level:"bronchial"}},
-      lung_lu: {spec: {organ:"lung", rr:22, level:"vesicular"}},
-    },
-    diagnosis: "右肺炎（肺実質の硬化）",
-    rubric: [
-      {label:"肺音の性状", points:2, keywords:[["気管支呼吸音"],["管状音"]]},
-      {label:"部位の左右差", points:1, keywords:[["右"],["左右差"]]},
-      {label:"具体的病態", points:2, keywords:["肺炎","硬化","consolidation"]},
-    ],
-  },
-  {
-    id: "OSCE-04", label: "22歳女性、突然の呼吸困難",
-    vignette: "22歳女性。気管支喘息の既往。夜間の突然の呼吸困難・喘鳴で救急受診。",
-    findings: {
-      lung_ru: {spec: {organ:"lung", rr:26, level:"decreased", adventitious:"wheeze", severity:"severe"}},
-      lung_lu: {spec: {organ:"lung", rr:26, level:"decreased", adventitious:"wheeze", severity:"severe"}},
-      lung_rl: {spec: {organ:"lung", rr:26, level:"decreased", adventitious:"wheeze"}},
-      lung_ll: {spec: {organ:"lung", rr:26, level:"decreased", adventitious:"wheeze"}},
-    },
-    diagnosis: "気管支喘息発作",
-    rubric: [
-      {label:"副雑音の性状", points:2, keywords:["wheeze",["笛様音"],["連続性","高調"]]},
-      {label:"分布", points:1, keywords:[["両側"],["吸気","呼気"]]},
-      {label:"具体的病態", points:2, keywords:["喘息","気管支喘息"]},
-    ],
-  },
-  {
-    id: "OSCE-05", label: "70歳男性、腹部膨満・嘔吐",
-    vignette: "70歳男性。開腹手術の既往。2日前からの腹部膨満・悪心嘔吐・排ガス停止。",
-    findings: {
-      ruq: {spec: {organ:"bowel", kind:"obstructive"}},
-      luq: {spec: {organ:"bowel", kind:"obstructive"}},
-      rlq: {spec: {organ:"bowel", kind:"hyperactive"}},
-      llq: {spec: {organ:"bowel", kind:"obstructive"}},
-    },
-    diagnosis: "癒着性イレウス（機械的腸閉塞）",
-    rubric: [
-      {label:"腸雑音の性状", points:2, keywords:[["金属性"],["高調"],["tinkling"],["反響"]]},
-      {label:"腸雑音の頻度", points:1, keywords:[["亢進"],["頻回"]]},
-      {label:"具体的病態", points:2, keywords:["イレウス","腸閉塞","腸管閉塞"]},
-    ],
-  },
-  {
-    id: "OSCE-06", label: "80歳女性、術後3日目の無排ガス",
-    vignette: "80歳女性。開腹術後3日目。排ガス・排便なく腹部膨満が持続。",
-    findings: {
-      ruq: {spec: {organ:"bowel", kind:"absent"}},
-      luq: {spec: {organ:"bowel", kind:"absent"}},
-      rlq: {spec: {organ:"bowel", kind:"absent"}},
-      llq: {spec: {organ:"bowel", kind:"absent"}},
-    },
-    diagnosis: "麻痺性イレウス",
-    rubric: [
-      {label:"腸雑音の有無", points:2, keywords:[["消失"],["聴取できない"],["無音"]]},
-      {label:"聴取の作法", points:1, keywords:[["1分間"],["十分な時間"],["数分"]]},
-      {label:"具体的病態", points:2, keywords:["麻痺性イレウス","イレウス"]},
-    ],
-  },
-  {
-    id: "OSCE-07", label: "66歳男性、一過性の右上肢脱力",
-    vignette: "66歳男性。高血圧・喫煙歴あり。昨日、一過性の右上肢脱力と構音障害があり受診。",
-    findings: {
-      carotid_l: {spec: {organ:"vascular", hr:74, peak:0.3}},
-      carotid_r: {spec: {organ:"vascular", hr:74, peak:0.0}},
-    },
-    diagnosis: "左頸動脈狭窄症（一過性脳虚血発作の原因検索）",
-    rubric: [
-      {label:"雑音の有無・側性", points:2, keywords:[["左"],["頸動脈雑音"]]},
-      {label:"雑音のタイミング", points:1, keywords:[["収縮期"]]},
-      {label:"具体的病態", points:2, keywords:["頸動脈狭窄","TIA","一過性脳虚血"]},
-    ],
-  },
-];
-
 let osceOrder = [];
 let osceIdx = 0;
 let osceScore = 0, osceMax = 0;
@@ -745,19 +1123,17 @@ function shuffle(arr) {
   }
   return a;
 }
-
 function startOsce() {
   osceOrder = shuffle(OSCE_CASES);
   osceIdx = 0; osceScore = 0; osceMax = 0;
   loadOsceCase();
 }
-
 function loadOsceCase() {
   currentCase = osceOrder[osceIdx];
   checkedPoints = new Set();
   document.querySelectorAll(".landmark").forEach(g => g.classList.remove("checked"));
   document.getElementById("vignette").innerHTML =
-    `<div class="id">${currentCase.id}</div>${currentCase.vignette}`;
+    `<div class="id">${currentCase.id}</div>${tf(currentCase.vignette)}`;
   document.getElementById("osceAnswer").value = "";
   document.getElementById("osceAnswer").readOnly = false;
   document.getElementById("osceResult").innerHTML = "";
@@ -766,7 +1142,6 @@ function loadOsceCase() {
   updateChecklist();
   updateOsceHeader();
 }
-
 function updateChecklist() {
   const pts = Object.keys(currentCase.findings);
   const box = document.getElementById("chkItems");
@@ -774,17 +1149,15 @@ function updateChecklist() {
   pts.forEach(k => {
     const span = document.createElement("span");
     span.className = "chk-item" + (checkedPoints.has(k) ? " done" : "");
-    span.textContent = LANDMARKS[k].label;
+    span.textContent = tf(LANDMARKS[k].label);
     box.appendChild(span);
   });
 }
-
 function updateOsceHeader() {
   document.getElementById("pfill").style.width = (osceIdx / OSCE_CASES.length * 100) + "%";
   document.getElementById("ptxt").textContent = `${osceIdx + 1} / ${OSCE_CASES.length}`;
   document.getElementById("schip").textContent = `${osceScore} / ${osceMax} pt`;
 }
-
 function normalize(s) { return (s || "").replace(/\s+/g, ""); }
 function kwMatch(kw, norm) {
   if (Array.isArray(kw)) return kw.every(p => norm.includes(normalize(p)));
@@ -792,9 +1165,11 @@ function kwMatch(kw, norm) {
 }
 function gradeOsce(text, rubric) {
   const norm = normalize(text);
-  return rubric.map(r => ({...r, hit: r.keywords.some(kw => kwMatch(kw, norm))}));
+  return rubric.map(r => {
+    const kws = r.keywords[lang] || r.keywords.ja;
+    return {...r, hit: kws.some(kw => kwMatch(kw, norm))};
+  });
 }
-
 document.getElementById("osceSubmit").addEventListener("click", () => {
   const text = document.getElementById("osceAnswer").value;
   const results = gradeOsce(text, currentCase.rubric);
@@ -805,7 +1180,7 @@ document.getElementById("osceSubmit").addEventListener("click", () => {
   const rows = results.map(r => `
     <div class="rubric-row">
       <div class="mark ${r.hit ? "hit" : "miss"}">${r.hit ? "✓" : "−"}</div>
-      <div><div class="rubric-label">${r.label}（${r.points}点）</div></div>
+      <div><div class="rubric-label">${tf(r.label)}（${r.points}pt）</div></div>
     </div>`).join("");
 
   const pts = Object.keys(currentCase.findings);
@@ -813,13 +1188,13 @@ document.getElementById("osceSubmit").addEventListener("click", () => {
 
   document.getElementById("osceResult").innerHTML = `
     <div class="result">
-      <div class="result-score">${score} <span class="max">/ ${max} 点</span></div>
+      <div class="result-score">${score} <span class="max">/ ${max} pt</span></div>
       ${rows}
       <div class="explain">
-        <div class="t">想定診断</div>
-        ${currentCase.diagnosis}<br><br>
-        <div class="t">聴診部位の確認</div>
-        本症例で所見のある ${pts.length} 部位中 ${checkedCount} 部位を聴診しました。
+        <div class="t">${t("diagnosisTitle")}</div>
+        ${tf(currentCase.diagnosis)}<br><br>
+        <div class="t">${t("checklistResultTitle")}</div>
+        ${t("checklistResultBody", checkedCount, pts.length)}
       </div>
     </div>`;
   document.getElementById("osceAnswer").readOnly = true;
@@ -827,20 +1202,19 @@ document.getElementById("osceSubmit").addEventListener("click", () => {
   document.getElementById("osceNext").style.display = "inline-block";
   updateOsceHeader();
 });
-
 document.getElementById("osceNext").addEventListener("click", () => {
   osceIdx++;
   if (osceIdx >= OSCE_CASES.length) {
     document.getElementById("vignette").innerHTML = "";
-    document.getElementById("checklist-box");
     document.getElementById("osceResult").innerHTML = `
       <div class="result" style="text-align:center;padding:30px 0">
-        <div class="result-score" style="font-size:32px">${osceScore} <span class="max">/ ${osceMax} 点</span></div>
-        <div style="color:var(--sub);margin-top:6px">全${OSCE_CASES.length}症例終了</div>
+        <div class="result-score" style="font-size:32px">${osceScore} <span class="max">/ ${osceMax} pt</span></div>
+        <div style="color:var(--sub);margin-top:6px">${t("finishedLabel", OSCE_CASES.length)}</div>
         <div class="btnrow" style="justify-content:center;margin-top:18px">
-          <button class="act secondary" onclick="startOsce()">最初からやり直す</button>
+          <button class="act secondary" id="restartBtn">${t("restartBtn")}</button>
         </div>
       </div>`;
+    document.getElementById("restartBtn").addEventListener("click", startOsce);
     document.getElementById("osceNext").style.display = "none";
     updateOsceHeader();
   } else {
@@ -849,23 +1223,91 @@ document.getElementById("osceNext").addEventListener("click", () => {
 });
 
 /* --- モード切替 --- */
-document.getElementById("modeBtnPractice").addEventListener("click", () => {
-  mode = "practice";
-  document.getElementById("modeBtnPractice").classList.add("active");
-  document.getElementById("modeBtnOsce").classList.remove("active");
-  document.getElementById("panePractice").style.display = "block";
-  document.getElementById("paneOsce").style.display = "none";
-  highlightRelevantPoints();
+document.getElementById("modeBtnPractice").addEventListener("click", () => setMode("practice"));
+document.getElementById("modeBtnOsce").addEventListener("click", () => setMode("osce"));
+function setMode(m) {
+  mode = m;
+  document.getElementById("modeBtnPractice").classList.toggle("active", m === "practice");
+  document.getElementById("modeBtnOsce").classList.toggle("active", m === "osce");
+  document.getElementById("panePractice").style.display = m === "practice" ? "block" : "none";
+  document.getElementById("paneOsce").style.display = m === "osce" ? "block" : "none";
+  if (m === "osce") {
+    document.querySelectorAll(".landmark").forEach(g => g.style.opacity = "1");
+    if (osceOrder.length === 0) startOsce();
+  } else {
+    highlightRelevantPoints();
+  }
+}
+
+/* ============================================================================
+   多言語UIの反映
+============================================================================ */
+function applyLanguage() {
+  document.documentElement.lang = lang;
+  document.getElementById("appTitle").childNodes[0].textContent = t("title");
+  document.getElementById("appSubtitle").textContent = t("subtitle");
+  document.title = t("title");
+  document.getElementById("modeBtnPractice").textContent = t("modePractice");
+  document.getElementById("modeBtnOsce").textContent = t("modeOsce");
+  document.getElementById("nowPlaying").textContent = t("hoverHint");
+  document.getElementById("legendText").innerHTML = t("legend");
+  document.getElementById("lblOrgan").textContent = t("lblOrgan");
+  document.getElementById("lblFinding").textContent = t("lblFinding");
+  document.getElementById("practiceHint").innerHTML = "<b>" + (lang==="ja"?"使い方：":lang==="en"?"How to use: ":lang==="ko"?"사용법: ":"使用方法：") + "</b>" + t("practiceHint");
+  document.getElementById("getLinkBtn").textContent = "🔗 " + t("getLink");
+  document.getElementById("checklistTitle").textContent = t("checklistTitle");
+  document.getElementById("answerLabel").textContent = t("answerLabel");
+  document.getElementById("osceAnswer").placeholder = t("answerPlaceholder");
+  document.getElementById("osceSubmit").textContent = t("submitBtn");
+  document.getElementById("osceNext").textContent = t("nextBtn");
+  document.getElementById("footerNote").textContent = t("footerNote");
+
+  buildBodySVG();
+  populateOrganSelect();
+  populateFindings();
+  if (mode === "osce" && currentCase) {
+    document.getElementById("vignette").innerHTML =
+      `<div class="id">${currentCase.id}</div>${tf(currentCase.vignette)}`;
+    updateChecklist();
+  }
+}
+
+document.querySelectorAll(".langsel button").forEach(btn => {
+  btn.addEventListener("click", () => {
+    lang = btn.dataset.lang;
+    document.querySelectorAll(".langsel button").forEach(b => b.classList.toggle("active", b === btn));
+    applyLanguage();
+  });
 });
-document.getElementById("modeBtnOsce").addEventListener("click", () => {
-  mode = "osce";
-  document.getElementById("modeBtnOsce").classList.add("active");
-  document.getElementById("modeBtnPractice").classList.remove("active");
-  document.getElementById("panePractice").style.display = "none";
-  document.getElementById("paneOsce").style.display = "block";
-  document.querySelectorAll(".landmark").forEach(g => g.style.opacity = "1");
-  if (osceOrder.length === 0) startOsce();
-});
+
+/* ============================================================================
+   URLパラメータ処理（機能②：共有リンク／埋め込みモード）
+============================================================================ */
+(function initFromURL() {
+  const params = new URLSearchParams(location.search);
+  const pLang = params.get("lang");
+  if (pLang && UI[pLang]) lang = pLang;
+  document.querySelectorAll(".langsel button").forEach(b => b.classList.toggle("active", b.dataset.lang === lang));
+
+  const isEmbed = params.get("embed") === "1";
+  if (isEmbed) {
+    document.body.classList.add("embed");
+    document.getElementById("modeToggle").style.display = "none";
+  }
+
+  applyLanguage();
+
+  const pOrgan = params.get("organ");
+  const pFinding = params.get("finding");
+  if (pOrgan && FINDING_LIBRARY[pOrgan]) {
+    selOrgan.value = pOrgan;
+    populateFindings();
+    if (pFinding && FINDING_LIBRARY[pOrgan].findings[pFinding]) {
+      selFinding.value = pFinding;
+      updateDesc();
+    }
+  }
+})();
 </script>
 </body>
 </html>
